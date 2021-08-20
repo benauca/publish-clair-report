@@ -1,0 +1,31 @@
+{
+  "name": "publish-clair-report",
+  "version": "1.0.0",
+  "description": "Github actions for publish clair reporting",
+  "main": "lib/main.js",
+  "scripts": {
+    "build": "tsc --target ES5",
+    "format": "prettier --write **/*.ts",
+    "format-check": "prettier --check **/*.ts",
+    "lint": "eslint src/**/*.ts",
+    "package": "ncc build --source-map --license licenses.txt",
+    "test": "jest",
+    "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
+  },
+  "keywords": [
+    "GitHub",
+    "Actions",
+    "Clair"
+  ],
+  "author": "jbenaventem",
+  "license": "ISC",
+  "dependencies": {
+    "@actions/core": "^1.5.0",
+    "@actions/github": "^5.0.0",
+    "@actions/glob": "^0.2.0",
+    "@octokit/rest": "^18.9.1",
+    "@types/es6-promise": "^3.3.0",
+    "@types/node": "^16.6.2",
+    "parse-json": "^5.2.0"
+  }
+}
