@@ -82,8 +82,7 @@ async function parseVulnerability(
                 end_column: 0,
                 annotation_level: 'warning',
                 title: packageName,
-                message: name + "\n\t" +
-                    "Package: " + packageName + (version.length>0)?(": " + version):""  + (fixed_resolved.length>0)?("\n\tFixed Resolved: " + fixed_resolved):"\n\t" + "\n\tInfo: \n\t" + links.replace(" ","\n"),
+                message: name + "\n\t" + "\n\tFixed Resolved: " + fixed_resolved+ "\nLinks: " + links.replace(" ","\n"),
                 raw_details: description
             })
 
