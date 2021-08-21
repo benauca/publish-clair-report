@@ -33,8 +33,9 @@ export interface Annotation {
 export async function parseFile(
     file: string): Promise<ScannerReport> {
 
-    core.debug(`Parsing file ${file}`)
+    core.info(`Parsing file ${file}`)
     const data: string = fs.readFileSync(file, 'utf8')
+    core.info(data.length>0?"data has Content." : " Upps.............");
     const report = parseJson(data, {compact: true});
     const vulnerabilities = report['vulnerabilities'];
     return parseVulnerability(vulnerabilities)
@@ -76,7 +77,7 @@ async function parseVulnerability(
     let count = 0
     let skipped = 0
     const annotations: Annotation[] = []
-    core.debug("Vulneraibility is " + vulnerabilities)
+    core.info("Vulneraibility is " + vulnerabilities)
     for (let vuln in vulnerabilities) {
         if (vulnerabilities.hasOwnProperty(vuln)) {
             const version = (vulnerabilities[vuln]["package"]["version"]) != "" ? (":" + (vulnerabilities[vuln]["package"]["version"])) : "";
@@ -86,15 +87,15 @@ async function parseVulnerability(
             const links:string = (vulnerabilities[vuln]["links"]);
             const severity = (vulnerabilities[vuln]["normalized_severity"]);
             const fixed_resolved = (vulnerabilities[vuln]["fixed_in_version"]);
-            core.debug("======================");
-            core.debug("\t" + title);
-            core.debug("\n\t\t" + name);
-            core.debug("\n\t\t" + description);
-            core.debug("\n\t\t" + links);
-            core.debug("\n\t\t" + severity);
-            core.debug("\n\t\tResolved in " + fixed_resolved);
+            core.info("======================");
+            core.info("\t" + title);
+            core.info("\n\t\t" + name);
+            core.info("\n\t\t" + description);
+            core.info("\n\t\t" + links);
+            core.info("\n\t\t" + severity);
+            core.info("\n\t\tResolved in " + fixed_resolved);
 
-            core.debug("======================");
+            core.info("======================");
              annotations.push({
                 path: links.split(' ')[0],
                 start_line: 0,
