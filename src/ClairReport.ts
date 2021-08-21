@@ -67,7 +67,7 @@ async function parseVulnerability(
     for (let vuln in vulnerabilities) {
         if (vulnerabilities.hasOwnProperty(vuln)) {
             const version = (vulnerabilities[vuln]["package"]["version"]) != "" ? (":" + (vulnerabilities[vuln]["package"]["version"])) : "";
-            const title = (vulnerabilities[vuln]["package"]["name"] + version);
+            const packageName = (vulnerabilities[vuln]["package"]["name"] + version);
             const name = (vulnerabilities[vuln]["name"]);
             const description: string = (vulnerabilities[vuln]["description"]);
             const links: string = (vulnerabilities[vuln]["links"]);
@@ -81,8 +81,9 @@ async function parseVulnerability(
                 start_column: 0,
                 end_column: 0,
                 annotation_level: 'warning',
-                title: name,
-                message: "Package: " + title + (version.length>0)?(": " + version):""  + (fixed_resolved.length>0)?("\n\nFixed Resolved: " + fixed_resolved):"\n\n" + "\n\nInfo: \n" + links.replace(" ","\n"),
+                title: packageName,
+                message: name + "\n\t" +
+                    "Package: " + packageName + (version.length>0)?(": " + version):""  + (fixed_resolved.length>0)?("\n\tFixed Resolved: " + fixed_resolved):"\n\t" + "\n\tInfo: \n\t" + links.replace(" ","\n"),
                 raw_details: description
             })
 

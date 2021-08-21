@@ -113,7 +113,7 @@ function parseVulnerability(
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 vulnerabilities) {
     return __awaiter(this, void 0, void 0, function () {
-        var count, skipped, annotations, vuln, version, title, name_1, description, links, reference, severity, fixed_resolved;
+        var count, skipped, annotations, vuln, version, packageName, name_1, description, links, reference, severity, fixed_resolved;
         return __generator(this, function (_a) {
             count = 0;
             skipped = 0;
@@ -122,7 +122,7 @@ vulnerabilities) {
             for (vuln in vulnerabilities) {
                 if (vulnerabilities.hasOwnProperty(vuln)) {
                     version = (vulnerabilities[vuln]["package"]["version"]) != "" ? (":" + (vulnerabilities[vuln]["package"]["version"])) : "";
-                    title = (vulnerabilities[vuln]["package"]["name"] + version);
+                    packageName = (vulnerabilities[vuln]["package"]["name"] + version);
                     name_1 = (vulnerabilities[vuln]["name"]);
                     description = (vulnerabilities[vuln]["description"]);
                     links = (vulnerabilities[vuln]["links"]);
@@ -136,8 +136,9 @@ vulnerabilities) {
                         start_column: 0,
                         end_column: 0,
                         annotation_level: 'warning',
-                        title: name_1,
-                        message: "Package: " + title + (version.length > 0) ? (": " + version) : 0,
+                        title: packageName,
+                        message: name_1 + "\n\t" +
+                            "Package: " + packageName + (version.length > 0) ? (": " + version) : "" + (fixed_resolved.length > 0) ? ("\n\tFixed Resolved: " + fixed_resolved) : "\n\t" + "\n\tInfo: \n\t" + links.replace(" ", "\n"),
                         raw_details: description
                     });
                 }
