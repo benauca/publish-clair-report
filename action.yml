@@ -1,0 +1,38 @@
+name: 'Clair Scan Clair'
+description: 'Report Clair scan results as annotations on Github Pull Request [clair]'
+branding:
+  icon: 'check-circle'
+  color: 'green'
+inputs:
+  token:
+    description: 'Specify the token to use to publish the check.'
+    required: false
+    default: ${{ github.token }}
+  github_token:
+    description: 'Deprecated syntax to specify github token.'
+    required: true
+  report_paths:
+    description: 'Scan json report paths in glob format'
+    required: true
+  check_name:
+    description: 'Check name for test reports.'
+    required: false
+    default: 'Clair Scan Report'
+  commit:
+    description: 'Commit SHA to update the check status.'
+    required: false
+  fail_on_failure:
+    description: 'Fail the build in case to find a severity hight vulnerability .'
+    required: false
+    default: 'false'
+  require_tests:
+    description: 'Fail if no json scan is found.'
+    required: false
+    default: 'false'
+  summary:
+    description: 'Additional text to summary output'
+    required: false
+    default: ''
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
