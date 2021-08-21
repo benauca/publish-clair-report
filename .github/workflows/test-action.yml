@@ -9,6 +9,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
       - name: Publish Clair Scan
-        run: ./
+        uses: ./
         with:
           report_paths: assets/**/*.json
