@@ -1,0 +1,14 @@
+name: Test Clair publish Scan
+on: [push]
+
+jobs:
+  publish-report:
+    name: Publis Clair report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Publish Clair Scan
+        run: ./
+        with:
+          report_paths: assets/**/*.json

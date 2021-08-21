@@ -1,0 +1,8 @@
+  
+{
+    "ignorePatterns": [
+      {
+        "pattern": "^https://github.com/santander-group/git-tag-counter-action/*"
+      }
+    ]
+  }
