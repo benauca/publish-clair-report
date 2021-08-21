@@ -130,14 +130,14 @@ vulnerabilities) {
                     severity = (vulnerabilities[vuln]["normalized_severity"]);
                     fixed_resolved = (vulnerabilities[vuln]["fixed_in_version"]);
                     annotations.push({
-                        path: reference,
+                        path: links.split(" ")[0],
                         start_line: 0,
                         end_line: 0,
                         start_column: 0,
                         end_column: 0,
                         annotation_level: 'warning',
                         title: name_1,
-                        message: "Package:" + title + ": " + version + "\nFixed Resolved: " + fixed_resolved + "\nInfo: \n" + links,
+                        message: "Package: " + title + (version.length > 0) ? (": " + version) : 0,
                         raw_details: description
                     });
                 }
