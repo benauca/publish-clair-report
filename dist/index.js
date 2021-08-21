@@ -113,7 +113,7 @@ function parseVulnerability(
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 vulnerabilities) {
     return __awaiter(this, void 0, void 0, function () {
-        var count, skipped, annotations, vuln, version, title, name_1, description, links, severity, fixed_resolved;
+        var count, skipped, annotations, vuln, version, title, name_1, description, links, reference, severity, fixed_resolved;
         return __generator(this, function (_a) {
             count = 0;
             skipped = 0;
@@ -126,28 +126,18 @@ vulnerabilities) {
                     name_1 = (vulnerabilities[vuln]["name"]);
                     description = (vulnerabilities[vuln]["description"]);
                     links = (vulnerabilities[vuln]["links"]);
+                    reference = (vulnerabilities[vuln]["links"])[0];
                     severity = (vulnerabilities[vuln]["normalized_severity"]);
                     fixed_resolved = (vulnerabilities[vuln]["fixed_in_version"]);
-                    /*
-                                core.info("======================");
-                                core.info("\t" + title);
-                                core.info("\n\t\t" + name);
-                                core.info("\n\t\t" + description);
-                                core.info("\n\t\t" + links);
-                                core.info("\n\t\t" + severity);
-                                core.info("\n\t\tResolved in " + fixed_resolved);
-        
-                                core.info("======================");
-                    */
                     annotations.push({
-                        path: links.split(' ')[0],
+                        path: reference,
                         start_line: 0,
                         end_line: 0,
                         start_column: 0,
                         end_column: 0,
                         annotation_level: 'warning',
-                        title: version + ": " + title,
-                        message: name_1 + "\nFixed Resolved: " + fixed_resolved + "Info: \n" + links,
+                        title: name_1,
+                        message: "Package:" + title + ": " + version + "\nFixed Resolved: " + fixed_resolved + "\nInfo: \n" + links,
                         raw_details: description
                     });
                 }
@@ -246,7 +236,7 @@ function run() {
                     _a.trys.push([0, 6, , 7]);
                     core.startGroup(" Getting input values");
                     summary = core.getInput('summary');
-                    reportPaths = "assets/clair-report/test-01.json";
+                    reportPaths = core.getInput('report_paths');
                     token = core.getInput('token') ||
                         core.getInput('github_token') ||
                         process.env.GITHUB_TOKEN;

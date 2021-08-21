@@ -71,28 +71,18 @@ async function parseVulnerability(
             const name = (vulnerabilities[vuln]["name"]);
             const description: string = (vulnerabilities[vuln]["description"]);
             const links: string = (vulnerabilities[vuln]["links"]);
+            const reference: string = (vulnerabilities[vuln]["links"])[0];
             const severity = (vulnerabilities[vuln]["normalized_severity"]);
             const fixed_resolved = (vulnerabilities[vuln]["fixed_in_version"]);
-            /*
-                        core.info("======================");
-                        core.info("\t" + title);
-                        core.info("\n\t\t" + name);
-                        core.info("\n\t\t" + description);
-                        core.info("\n\t\t" + links);
-                        core.info("\n\t\t" + severity);
-                        core.info("\n\t\tResolved in " + fixed_resolved);
-
-                        core.info("======================");
-            */
             annotations.push({
-                path: links.split(' ')[0],
+                path: reference,
                 start_line: 0,
                 end_line: 0,
                 start_column: 0,
                 end_column: 0,
                 annotation_level: 'warning',
-                title: version + ": " + title,
-                message: name + "\nFixed Resolved: " + fixed_resolved + "Info: \n" + links,
+                title: name,
+                message: "Package:" + title + ": " + version  + "\nFixed Resolved: " + fixed_resolved + "\nInfo: \n" + links,
                 raw_details: description
             })
 
