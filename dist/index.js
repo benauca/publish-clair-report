@@ -11513,22 +11513,23 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 var core = __nccwpck_require__(551);
 var glob = __nccwpck_require__(337);
 var fs = __nccwpck_require__(5747);
+// @ts-ignore
 var parseJson = __nccwpck_require__(9876);
 /**
  * Json File parser
  * @param file, Clair report as Json file
- * @param suiteRegex
  */
 function parseFile(file) {
     return __awaiter(this, void 0, void 0, function () {
         var data, report, vulnerabilities;
         return __generator(this, function (_a) {
-            core.debug("Parsing file " + file);
+            core.info("Parsing file " + file);
             data = fs.readFileSync(file, 'utf8');
+            core.info(data.length > 0 ? "data has Content." : " Upps.............");
             report = parseJson(data, { compact: true });
             vulnerabilities = report['vulnerabilities'];
             return [2 /*return*/, parseVulnerability(vulnerabilities)];
@@ -11539,7 +11540,6 @@ exports.parseFile = parseFile;
 /**
  * Parser Scanner Reports
  * @param reportPaths
- * @param suiteRegex
  */
 function parseScannerReports(reportPaths) {
     return __awaiter(this, void 0, void 0, function () {
@@ -11578,7 +11578,7 @@ function parseScannerReports(reportPaths) {
                     return [3 /*break*/, 14];
                 case 9:
                     _e.trys.push([9, , 12, 13]);
-                    if (!(_c && !_c.done && (_a = _b["return"]))) return [3 /*break*/, 11];
+                    if (!(_c && !_c.done && (_a = _b.return))) return [3 /*break*/, 11];
                     return [4 /*yield*/, _a.call(_b)];
                 case 10:
                     _e.sent();
@@ -11596,9 +11596,7 @@ function parseScannerReports(reportPaths) {
 exports.parseScannerReports = parseScannerReports;
 /**
  * Parser Vulnerability
- * @param suite
- * @param parentName
- * @param suiteRegex
+ * @param vulnerabilities
  */
 function parseVulnerability(
 /* eslint-disable  @typescript-eslint/no-explicit-any */
@@ -11609,7 +11607,7 @@ vulnerabilities) {
             count = 0;
             skipped = 0;
             annotations = [];
-            core.debug("Vulneraibility is " + vulnerabilities);
+            core.info("Vulneraibility is " + vulnerabilities);
             for (vuln in vulnerabilities) {
                 if (vulnerabilities.hasOwnProperty(vuln)) {
                     version = (vulnerabilities[vuln]["package"]["version"]) != "" ? (":" + (vulnerabilities[vuln]["package"]["version"])) : "";
@@ -11619,14 +11617,14 @@ vulnerabilities) {
                     links = (vulnerabilities[vuln]["links"]);
                     severity = (vulnerabilities[vuln]["normalized_severity"]);
                     fixed_resolved = (vulnerabilities[vuln]["fixed_in_version"]);
-                    core.debug("======================");
-                    core.debug("\t" + title);
-                    core.debug("\n\t\t" + name_1);
-                    core.debug("\n\t\t" + description);
-                    core.debug("\n\t\t" + links);
-                    core.debug("\n\t\t" + severity);
-                    core.debug("\n\t\tResolved in " + fixed_resolved);
-                    core.debug("======================");
+                    core.info("======================");
+                    core.info("\t" + title);
+                    core.info("\n\t\t" + name_1);
+                    core.info("\n\t\t" + description);
+                    core.info("\n\t\t" + links);
+                    core.info("\n\t\t" + severity);
+                    core.info("\n\t\tResolved in " + fixed_resolved);
+                    core.info("======================");
                     annotations.push({
                         path: links.split(' ')[0],
                         start_line: 0,
@@ -11699,21 +11697,19 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 var core = __nccwpck_require__(551);
 var github = __nccwpck_require__(6151);
 var ClairReport_1 = __nccwpck_require__(8345);
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var summary, reportPaths, suiteRegex, token, checkName, commit, failOnFailure, requireTests, clairReport, vulnerabilities, title, pullRequest, link, conclusion, status_1, head_sha, createCheckRequest, octokit, error_1, error_2;
+        var summary, token, checkName, commit, failOnFailure, requireTests, reportPaths, clairReport, vulnerabilities, title, pullRequest, link, conclusion, status_1, head_sha, createCheckRequest, octokit, error_1, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 6, , 7]);
                     core.startGroup(" Getting input values");
                     summary = core.getInput('summary');
-                    reportPaths = core.getInput('report_paths');
-                    suiteRegex = core.getInput('suite_regex');
                     token = core.getInput('token') ||
                         core.getInput('github_token') ||
                         process.env.GITHUB_TOKEN;
@@ -11727,6 +11723,8 @@ function run() {
                     requireTests = core.getInput('require_tests') === 'true';
                     core.endGroup();
                     core.startGroup(" Process Scan Reports...");
+                    reportPaths = "assets/clair-report/*.json";
+                    console.log("--" + reportPaths);
                     return [4 /*yield*/, ClairReport_1.parseScannerReports(reportPaths)];
                 case 1:
                     clairReport = _a.sent();

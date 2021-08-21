@@ -7,7 +7,7 @@ export async function run(): Promise<void> {
     try {
         core.startGroup(` Getting input values`);
         const summary = core.getInput('summary')
-        const reportPaths = core.getInput('report_paths')
+        //const reportPaths = core.getInput('report_paths')
         const token =
             core.getInput('token') ||
             core.getInput('github_token') ||
@@ -25,6 +25,8 @@ export async function run(): Promise<void> {
         core.endGroup()
 
         core.startGroup(` Process Scan Reports...`)
+        const reportPaths:any = "assets/clair-report/*.json"
+        console.log("--" + reportPaths);
         const clairReport = await parseScannerReports(reportPaths);
         const vulnerabilities = clairReport.count > 0 || clairReport.skipped > 0;
 

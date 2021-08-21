@@ -45,21 +45,19 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var core = require("@actions/core");
 var github = require("@actions/github");
 var ClairReport_1 = require("./ClairReport");
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var summary, reportPaths, suiteRegex, token, checkName, commit, failOnFailure, requireTests, clairReport, vulnerabilities, title, pullRequest, link, conclusion, status_1, head_sha, createCheckRequest, octokit, error_1, error_2;
+        var summary, token, checkName, commit, failOnFailure, requireTests, reportPaths, clairReport, vulnerabilities, title, pullRequest, link, conclusion, status_1, head_sha, createCheckRequest, octokit, error_1, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 6, , 7]);
                     core.startGroup(" Getting input values");
                     summary = core.getInput('summary');
-                    reportPaths = core.getInput('report_paths');
-                    suiteRegex = core.getInput('suite_regex');
                     token = core.getInput('token') ||
                         core.getInput('github_token') ||
                         process.env.GITHUB_TOKEN;
@@ -73,6 +71,8 @@ function run() {
                     requireTests = core.getInput('require_tests') === 'true';
                     core.endGroup();
                     core.startGroup(" Process Scan Reports...");
+                    reportPaths = "assets/clair-report/*.json";
+                    console.log("--" + reportPaths);
                     return [4 /*yield*/, ClairReport_1.parseScannerReports(reportPaths)];
                 case 1:
                     clairReport = _a.sent();
