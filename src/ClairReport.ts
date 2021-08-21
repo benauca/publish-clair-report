@@ -1,10 +1,11 @@
-import * as core from '@actions/core'
-import * as glob from '@actions/glob'
+import * as core from '@actions/core';
+import * as glob from '@actions/glob';
 import * as fs from 'fs';
+// @ts-ignore
 import * as parseJson from 'parse-json';
 
 /**
- *
+ * Scanner Report
  */
 export interface ScannerReport {
     count: number
@@ -28,7 +29,6 @@ export interface Annotation {
 /**
  * Json File parser
  * @param file, Clair report as Json file
- * @param suiteRegex
  */
 export async function parseFile(
     file: string): Promise<ScannerReport> {
@@ -43,7 +43,6 @@ export async function parseFile(
 /**
  * Parser Scanner Reports
  * @param reportPaths
- * @param suiteRegex
  */
 export async function parseScannerReports(
     reportPaths: string
@@ -68,9 +67,7 @@ export async function parseScannerReports(
 
 /**
  * Parser Vulnerability
- * @param suite
- * @param parentName
- * @param suiteRegex
+ * @param vulnerabilities
  */
 async function parseVulnerability(
     /* eslint-disable  @typescript-eslint/no-explicit-any */

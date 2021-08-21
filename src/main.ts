@@ -8,7 +8,6 @@ export async function run(): Promise<void> {
         core.startGroup(` Getting input values`);
         const summary = core.getInput('summary')
         const reportPaths = core.getInput('report_paths')
-        const suiteRegex = core.getInput('suite_regex')
         const token =
             core.getInput('token') ||
             core.getInput('github_token') ||

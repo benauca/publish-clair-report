@@ -10,6 +10,7 @@
     "lint": "eslint src/**/*.ts",
     "package": "ncc build --source-map --license licenses.txt",
     "test": "jest",
+    "coverage": "jest --coverage",
     "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
   },
   "keywords": [
@@ -27,5 +28,13 @@
     "@types/es6-promise": "^3.3.0",
     "@types/node": "^16.6.2",
     "parse-json": "^5.2.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.1",
+    "@babel/core": "^7.15.0",
+    "babel-jest": "^27.0.6",
+    "jest": "^27.0.6",
+    "ts-jest": "^27.0.5",
+    "typescript": "^4.3.5"
   }
 }
