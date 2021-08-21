@@ -5,7 +5,7 @@
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc --target ES5",
-    "dist": "ncc build src/main.js --license licenses.txt",
+    "dist": "ncc build lib/main.js --license licenses.txt",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
     "lint": "lint src/**/*.ts",

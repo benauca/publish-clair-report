@@ -7,7 +7,7 @@ export async function run(): Promise<void> {
     try {
         core.startGroup(` Getting input values`);
         const summary = core.getInput('summary')
-        //const reportPaths = core.getInput('report_paths')
+        const reportPaths = core.getInput('report_paths')
         const token =
             core.getInput('token') ||
             core.getInput('github_token') ||
@@ -25,19 +25,18 @@ export async function run(): Promise<void> {
         core.endGroup()
 
         core.startGroup(` Process Scan Reports...`)
-        const reportPaths:any = "assets/clair-report/*.json"
-        console.log("--" + reportPaths);
         const clairReport = await parseScannerReports(reportPaths);
         const vulnerabilities = clairReport.count > 0 || clairReport.skipped > 0;
-
-        const title = vulnerabilities
-            ? `${clairReport.count} tests run, ${clairReport.skipped} skipped, ${clairReport.annotations.length} founds.`
+        core.info(`Vulnerabilities: ` + clairReport.annotations.length)
+        core.info(`Clair report count: ` + clairReport.count)
+        const title = clairReport.annotations.length > 0
+            ? `${clairReport.annotations.length} Vulnerabilities founds.`
             : 'No Vulnerabilities found!'
         core.info(`${title}`)
 
-        if (!vulnerabilities) {
+        if (!clairReport.annotations.length) {
             if (requireTests) {
-                core.setFailed(' No Vulnerabilities found')
+                core.setFailed(' No Vulnerabilities found [2]')
             }
             return
         }
