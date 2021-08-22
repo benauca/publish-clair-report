@@ -25,7 +25,7 @@ inputs:
     description: 'Fail the build in case to find a severity hight vulnerability .'
     required: false
     default: 'false'
-  require_tests:
+  require_scans:
     description: 'Fail if no json scan is found.'
     required: false
     default: 'false'
@@ -33,6 +33,10 @@ inputs:
     description: 'Additional text to summary output'
     required: false
     default: ''
+  severity_level:
+    description: 'Severity Level to publish scan'
+    required: false
+    default: 'High'
 runs:
   using: 'node12'
   main: 'dist/index.js'

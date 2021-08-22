@@ -49,14 +49,15 @@ report available before uploading it to Harbor.
 ## Inputs
 
 | **Input**         | **Required**  | **Default**               | **Description**                                                                                           |
-|:---------------   |:-----         |:--------                  |:----------------------------------------------------------------------------------------------------------|
-| `report_paths`    | **True**      | `no`                      | [Glob](https://github.com/actions/toolkit/tree/master/packages/glob) expression to clair report paths.    |
-| `token`           | **False**     | `${{ github.token }}`     | GitHub token for creating a check run.                           |
-| `check_name`      | **False**     | `Scan Report`             | Check name to use when creating a check run.                                |
-| `commit`          | **False**     | `no`                      | The commit SHA to update the status. This is useful when you run it with `workflow_run`.                  |
-| `fail_on_failure` | **False**     | `false`                   | Fail the action in case of a test failure.                                                                 |
-| `require_tests`   | **False**     | `false`                   | Fail if no report are found.                                                                                |
-| `summary       `  | **False**     | `no`                      | Additional text to summary output                                                                         |
+|:---------------   |:-----         |:--------                  |:---------------------------------------------------------------------------------------------------|
+| `report_paths`    | **True**      | `no`                      | Clair report paths.                                                                                |
+| `severity_level`  | **False**     | `High`                    | Clair Severity level for Filter `Unknown` `Negligible` `Low` `Medium` `High` `Critical` `Defcon1`  |
+| `token`           | **False**     | `${{ github.token }}`     | GitHub token for creating a check run.                                                             |
+| `check_name`      | **False**     | `Scan Report`             | Check name to use when creating a check run.                                                       |
+| `commit`          | **False**     | `no`                      | The commit SHA to update the status. This is useful when you run it with `workflow_run`.           |
+| `fail_on_failure` | **False**     | `false`                   | Fail the action in case of a test failure.                                                         |
+| `require_scan`    | **False**     | `false`                   | Fail if no report are found.                                                                       |
+| `summary       `  | **False**     | `no`                      | Additional text to summary output                                                                  |
 
 
 ## Build

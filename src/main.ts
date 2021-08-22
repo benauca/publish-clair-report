@@ -19,13 +19,15 @@ export async function run(): Promise<void> {
         }
         const checkName = core.getInput('check_name')
         const commit = core.getInput('commit')
-        const failOnFailure = core.getInput('fail_on_failure') === 'true'
-        const requireTests = core.getInput('require_tests') === 'true'
-
+        const failOnFailure: boolean = core.getInput('fail_on_failure') === 'true'
+        const requireScans: boolean = core.getInput('require_scans') === 'true'
+        const severityLevel = core.getInput('severity_level')
+        core.info("Filter By security: " + severityLevel)
         core.endGroup()
 
         core.startGroup(` Process Scan Reports...`)
-        const clairReport = await parseScannerReports(reportPaths);
+        // @ts-ignore
+        const clairReport = await parseScannerReports(reportPaths, severityLevel);
         const vulnerabilities = clairReport.count > 0 || clairReport.skipped > 0;
         core.info(`Vulnerabilities: ` + clairReport.annotations.length)
         core.info(`Clair report count: ` + clairReport.count)
@@ -35,8 +37,8 @@ export async function run(): Promise<void> {
         core.info(`${title}`)
 
         if (!clairReport.annotations.length) {
-            if (requireTests) {
-                core.setFailed(' No Vulnerabilities found [2]')
+            if (requireScans) {
+                core.setFailed(' No Vulnerabilities found!')
             }
             return
         }
@@ -92,4 +94,5 @@ export async function run(): Promise<void> {
         core.setFailed(error.message)
     }
 }
+
 run()

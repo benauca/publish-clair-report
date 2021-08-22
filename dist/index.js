@@ -62,18 +62,19 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseFile = exports.parseScannerReports = void 0;
+exports.Severity = exports.mappingSeverity = exports.parseFile = exports.parseScannerReports = void 0;
 var core = __importStar(__nccwpck_require__(551));
 var fs = __importStar(__nccwpck_require__(5747));
 /**
  * Parser Scanner Reports
- * @param reportPaths
+ * @param reportPaths Location path reports
+ * @param severity Severit to filter
  */
-function parseScannerReports(reportPaths) {
+function parseScannerReports(reportPaths, level) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, parseFile(reportPaths)];
+                case 0: return [4 /*yield*/, parseFile(reportPaths, level)];
                 case 1: return [2 /*return*/, _a.sent()];
             }
         });
@@ -83,8 +84,9 @@ exports.parseScannerReports = parseScannerReports;
 /**
  * Json File parser
  * @param file, Clair report as Json file
+ * @param severity, Severity
  */
-function parseFile(file) {
+function parseFile(file, severity) {
     return __awaiter(this, void 0, void 0, function () {
         var annotations, count, skipped, data, parseJson, report, vulnerabilities;
         return __generator(this, function (_a) {
@@ -98,7 +100,7 @@ function parseFile(file) {
                     parseJson = __nccwpck_require__(9876);
                     report = parseJson(data);
                     vulnerabilities = report['vulnerabilities'];
-                    return [4 /*yield*/, parseVulnerability(vulnerabilities)];
+                    return [4 /*yield*/, parseVulnerability(vulnerabilities, severity)];
                 case 1: return [2 /*return*/, _a.sent()];
             }
         });
@@ -111,16 +113,26 @@ exports.parseFile = parseFile;
  */
 function parseVulnerability(
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-vulnerabilities) {
+vulnerabilities, severityLevel) {
     return __awaiter(this, void 0, void 0, function () {
-        var count, skipped, annotations, vuln, version, packageName, name_1, description, links, reference, severity, fixed_resolved;
-        return __generator(this, function (_a) {
-            count = 0;
-            skipped = 0;
-            annotations = [];
-            core.info("Vulneraibility is " + vulnerabilities);
-            for (vuln in vulnerabilities) {
-                if (vulnerabilities.hasOwnProperty(vuln)) {
+        var count, skipped, annotations, _a, _b, _i, vuln, version, packageName, name_1, description, links, reference, severity, fixed_resolved, _c, _d;
+        var _e;
+        return __generator(this, function (_f) {
+            switch (_f.label) {
+                case 0:
+                    count = 0;
+                    skipped = 0;
+                    annotations = [];
+                    core.info("Vulneraibility is " + vulnerabilities);
+                    _a = [];
+                    for (_b in vulnerabilities)
+                        _a.push(_b);
+                    _i = 0;
+                    _f.label = 1;
+                case 1:
+                    if (!(_i < _a.length)) return [3 /*break*/, 4];
+                    vuln = _a[_i];
+                    if (!vulnerabilities.hasOwnProperty(vuln)) return [3 /*break*/, 3];
                     version = (vulnerabilities[vuln]["package"]["version"]) != "" ? (":" + (vulnerabilities[vuln]["package"]["version"])) : "";
                     packageName = (vulnerabilities[vuln]["package"]["name"] + version);
                     name_1 = (vulnerabilities[vuln]["name"]);
@@ -129,25 +141,74 @@ vulnerabilities) {
                     reference = (vulnerabilities[vuln]["links"])[0];
                     severity = (vulnerabilities[vuln]["normalized_severity"]);
                     fixed_resolved = (vulnerabilities[vuln]["fixed_in_version"]);
-                    annotations.push({
+                    if (!(Severity[severity] >= Severity[severityLevel])) return [3 /*break*/, 3];
+                    _d = (_c = annotations).push;
+                    _e = {
                         path: links.split(" ")[0],
                         start_line: 0,
                         end_line: 0,
                         start_column: 0,
-                        end_column: 0,
-                        annotation_level: 'warning',
-                        title: packageName,
-                        message: name_1,
-                        //+ "\n\t" + "\n\tFixed Resolved: " + fixed_resolved+ "\nLinks: " + links.replace(" ","\n"),
-                        raw_details: description
-                    });
-                }
+                        end_column: 0
+                    };
+                    return [4 /*yield*/, mappingSeverity(severity)];
+                case 2:
+                    _d.apply(_c, [(_e.annotation_level = _f.sent(),
+                            _e.title = (version.length > 0) ? (packageName + " [ " + version + " ]") : packageName,
+                            _e.message = (fixed_resolved.length > 0) ? (name_1 + " \nFixed Resolved in: [ " + fixed_resolved + " ]") : name_1,
+                            _e.raw_details = description,
+                            _e)]);
+                    _f.label = 3;
+                case 3:
+                    _i++;
+                    return [3 /*break*/, 1];
+                case 4:
+                    core.info("Annotations is: " + annotations.length);
+                    return [2 /*return*/, { count: count, skipped: skipped, annotations: annotations }];
             }
-            core.info("Annotations is: " + annotations.length);
-            return [2 /*return*/, { count: count, skipped: skipped, annotations: annotations }];
         });
     });
 }
+/**
+ * Convert severity to  annotation level
+ * 'failure' | 'notice' | 'warning'
+ * @param severity
+ */
+function mappingSeverity(severity) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (severity.toLowerCase()) {
+                case "unknown":
+                    return [2 /*return*/, 'notice'];
+                case "negligible":
+                    return [2 /*return*/, 'notice'];
+                case "low":
+                    return [2 /*return*/, 'notice'];
+                case "medium":
+                    return [2 /*return*/, 'warning'];
+                case "high":
+                    return [2 /*return*/, 'failure'];
+                case "critical":
+                    return [2 /*return*/, 'failure'];
+                case "defcon1":
+                    return [2 /*return*/, 'failure'];
+                default:
+                    return [2 /*return*/, 'notice'];
+            }
+            return [2 /*return*/];
+        });
+    });
+}
+exports.mappingSeverity = mappingSeverity;
+var Severity;
+(function (Severity) {
+    Severity[Severity["Unknown"] = 0] = "Unknown";
+    Severity[Severity["Negligible"] = 1] = "Negligible";
+    Severity[Severity["Low"] = 2] = "Low";
+    Severity[Severity["Medium"] = 3] = "Medium";
+    Severity[Severity["High"] = 4] = "High";
+    Severity[Severity["Critical"] = 5] = "Critical";
+    Severity[Severity["Defcon1"] = 6] = "Defcon1";
+})(Severity = exports.Severity || (exports.Severity = {}));
 //# sourceMappingURL=ClairReport.js.map
 
 /***/ }),
@@ -230,7 +291,7 @@ var github = __importStar(__nccwpck_require__(6151));
 var ClairReport_1 = __nccwpck_require__(723);
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var summary, reportPaths, token, checkName, commit, failOnFailure, requireTests, clairReport, vulnerabilities, title, pullRequest, link, conclusion, status_1, head_sha, createCheckRequest, octokit, error_1, error_2;
+        var summary, reportPaths, token, checkName, commit, failOnFailure, requireScans, severityLevel, clairReport, vulnerabilities, title, pullRequest, link, conclusion, status_1, head_sha, createCheckRequest, octokit, error_1, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -248,10 +309,12 @@ function run() {
                     checkName = core.getInput('check_name');
                     commit = core.getInput('commit');
                     failOnFailure = core.getInput('fail_on_failure') === 'true';
-                    requireTests = core.getInput('require_tests') === 'true';
+                    requireScans = core.getInput('require_scans') === 'true';
+                    severityLevel = core.getInput('severity_level');
+                    core.info("Filter By security: " + severityLevel);
                     core.endGroup();
                     core.startGroup(" Process Scan Reports...");
-                    return [4 /*yield*/, ClairReport_1.parseScannerReports(reportPaths)];
+                    return [4 /*yield*/, ClairReport_1.parseScannerReports(reportPaths, severityLevel)];
                 case 1:
                     clairReport = _a.sent();
                     vulnerabilities = clairReport.count > 0 || clairReport.skipped > 0;
@@ -262,8 +325,8 @@ function run() {
                         : 'No Vulnerabilities found!';
                     core.info("" + title);
                     if (!clairReport.annotations.length) {
-                        if (requireTests) {
-                            core.setFailed(' No Vulnerabilities found [2]');
+                        if (requireScans) {
+                            core.setFailed(' No Vulnerabilities found!');
                         }
                         return [2 /*return*/];
                     }
