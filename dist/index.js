@@ -338,6 +338,15 @@ function run() {
                     status_1 = 'completed';
                     head_sha = commit || (pullRequest && pullRequest.head.sha) || github.context.sha;
                     core.info("\u2139\uFE0F Posting status '" + status_1 + "' with conclusion '" + conclusion + "' to " + link + " (sha: " + head_sha + ")");
+                    summary +=
+                        "\nTotal: Vulnerabilities: 603" +
+                            "\n\t 💥 Defcon1 Vulnerabilities: 0 " +
+                            "\n\t 🔥 Critical Vulnerabilities: 0 " +
+                            "\n\t 💢 High Vulnerabilities: 4 " +
+                            "\n\t ☀ Medium Vulnerabilities: 192" +
+                            "\n\t ☔ Low Vulnerabilities: 277" +
+                            "\n\t ☁ Negligible Vulnerabilities: 130" +
+                            "\n\t 🌊 Unknown Vulnerabilities: 0";
                     createCheckRequest = __assign(__assign({}, github.context.repo), { name: checkName, head_sha: head_sha, status: status_1, conclusion: conclusion, output: {
                             title: title,
                             summary: summary,

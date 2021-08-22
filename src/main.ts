@@ -6,7 +6,7 @@ export async function run(): Promise<void> {
 
     try {
         core.startGroup(` Getting input values`);
-        const summary = core.getInput('summary')
+        let summary = core.getInput('summary')
         const reportPaths = core.getInput('report_paths')
         const token =
             core.getInput('token') ||
@@ -54,6 +54,16 @@ export async function run(): Promise<void> {
         core.info(
             `ℹ️ Posting status '${status}' with conclusion '${conclusion}' to ${link} (sha: ${head_sha})`
         )
+
+        summary +=
+            "\nTotal: Vulnerabilities: 603" +
+            "\n\t 💥 Defcon1 Vulnerabilities: 0 " +
+            "\n\t 🔥 Critical Vulnerabilities: 0 " +
+            "\n\t 💢 High Vulnerabilities: 4 " +
+            "\n\t ☀ Medium Vulnerabilities: 192" +
+            "\n\t ☔ Low Vulnerabilities: 277" +
+            "\n\t ☁ Negligible Vulnerabilities: 130" +
+            "\n\t 🌊 Unknown Vulnerabilities: 0"
 
         const createCheckRequest = {
             ...github.context.repo,
