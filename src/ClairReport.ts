@@ -112,7 +112,7 @@ async function parseVulnerability(
             const reference: string = (vulnerabilities[vuln]["links"])[0];
             const severity: SeverityStrings = (vulnerabilities[vuln]["normalized_severity"]);
             //@ts-ignore
-            summaryVulnerabilities.set(severity, groupsMap.get(severity)+1)
+            summaryVulnerabilities.set(severity, summaryVulnerabilities.get(severity)+1)
             const fixed_resolved = (vulnerabilities[vuln]["fixed_in_version"]);
 
             if (Severity[severity] >= Severity[severityLevel]) {

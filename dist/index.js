@@ -146,7 +146,7 @@ function parseVulnerability(vulnerabilities, severityLevel) {
                     reference = (vulnerabilities[vuln]["links"])[0];
                     severity = (vulnerabilities[vuln]["normalized_severity"]);
                     //@ts-ignore
-                    summaryVulnerabilities.set(severity, groupsMap.get(severity) + 1);
+                    summaryVulnerabilities.set(severity, summaryVulnerabilities.get(severity) + 1);
                     fixed_resolved = (vulnerabilities[vuln]["fixed_in_version"]);
                     if (!(Severity[severity] >= Severity[severityLevel])) return [3 /*break*/, 3];
                     _d = (_c = annotations).push;
