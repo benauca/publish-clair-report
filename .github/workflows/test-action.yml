@@ -14,4 +14,4 @@ jobs:
           report_paths: assets/clair-report/ubuntu*.json
           check_name: ' 📄  Results Clair Scan'
           summary: 'Results Clair Scan for image ubuntu-14.04.local'
-          severity_level: 'Negligible'
+          severity_level: 'Low'
