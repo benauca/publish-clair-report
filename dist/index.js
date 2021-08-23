@@ -88,13 +88,10 @@ exports.parseScannerReports = parseScannerReports;
  */
 function parseFile(file, severity) {
     return __awaiter(this, void 0, void 0, function () {
-        var annotations, count, skipped, data, parseJson, report, vulnerabilities;
+        var data, parseJson, report, vulnerabilities;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    annotations = [];
-                    count = 0;
-                    skipped = 0;
                     core.info("Parsing file " + file);
                     data = fs.readFileSync(file, 'utf8');
                     parseJson = __nccwpck_require__(9876);
@@ -111,17 +108,24 @@ exports.parseFile = parseFile;
  * Parser Vulnerability
  * @param vulnerabilities
  */
-function parseVulnerability(
-/* eslint-disable  @typescript-eslint/no-explicit-any */
-vulnerabilities, severityLevel) {
+function parseVulnerability(vulnerabilities, severityLevel) {
     return __awaiter(this, void 0, void 0, function () {
-        var count, skipped, annotations, _a, _b, _i, vuln, version, packageName, name_1, description, links, reference, severity, fixed_resolved, _c, _d;
+        var count, summaryVulnerabilities, annotations, _a, _b, _i, vuln, version, packageName, name_1, description, links, reference, severity, fixed_resolved, _c, _d;
         var _e;
         return __generator(this, function (_f) {
             switch (_f.label) {
                 case 0:
-                    count = 0;
-                    skipped = 0;
+                    count = 0 /*, unknown: number = 0, negligible: number = 0,
+                        low: number = 0, medium: number = 0, high: number = 0,
+                        critical: number = 0, defcon1: number = 0*/;
+                    summaryVulnerabilities = new Map();
+                    summaryVulnerabilities.set("Unknown", 0);
+                    summaryVulnerabilities.set("Negligible", 0);
+                    summaryVulnerabilities.set("Low", 0);
+                    summaryVulnerabilities.set("Medium", 0);
+                    summaryVulnerabilities.set("High", 0);
+                    summaryVulnerabilities.set("Critical", 0);
+                    summaryVulnerabilities.set("Defcon1", 0);
                     annotations = [];
                     core.info("Vulneraibility is " + vulnerabilities);
                     _a = [];
@@ -132,6 +136,7 @@ vulnerabilities, severityLevel) {
                 case 1:
                     if (!(_i < _a.length)) return [3 /*break*/, 4];
                     vuln = _a[_i];
+                    count++;
                     if (!vulnerabilities.hasOwnProperty(vuln)) return [3 /*break*/, 3];
                     version = (vulnerabilities[vuln]["package"]["version"]) != "" ? (":" + (vulnerabilities[vuln]["package"]["version"])) : "";
                     packageName = (vulnerabilities[vuln]["package"]["name"] + version);
@@ -140,6 +145,8 @@ vulnerabilities, severityLevel) {
                     links = (vulnerabilities[vuln]["links"]);
                     reference = (vulnerabilities[vuln]["links"])[0];
                     severity = (vulnerabilities[vuln]["normalized_severity"]);
+                    //@ts-ignore
+                    summaryVulnerabilities.set(severity, groupsMap.get(severity) + 1);
                     fixed_resolved = (vulnerabilities[vuln]["fixed_in_version"]);
                     if (!(Severity[severity] >= Severity[severityLevel])) return [3 /*break*/, 3];
                     _d = (_c = annotations).push;
@@ -163,7 +170,7 @@ vulnerabilities, severityLevel) {
                     return [3 /*break*/, 1];
                 case 4:
                     core.info("Annotations is: " + annotations.length);
-                    return [2 /*return*/, { count: count, skipped: skipped, annotations: annotations }];
+                    return [2 /*return*/, { count: count, summaryVulnerabilities: summaryVulnerabilities, annotations: annotations }];
             }
         });
     });
@@ -199,6 +206,9 @@ function mappingSeverity(severity) {
     });
 }
 exports.mappingSeverity = mappingSeverity;
+/**
+ * Severity Clair
+ */
 var Severity;
 (function (Severity) {
     Severity[Severity["Unknown"] = 0] = "Unknown";
@@ -317,8 +327,8 @@ function run() {
                     return [4 /*yield*/, ClairReport_1.parseScannerReports(reportPaths, severityLevel)];
                 case 1:
                     clairReport = _a.sent();
-                    vulnerabilities = clairReport.count > 0 || clairReport.skipped > 0;
-                    core.info("Vulnerabilities: " + clairReport.annotations.length);
+                    vulnerabilities = clairReport.count > 0;
+                    core.info("Total Vulnerabilities: " + clairReport.annotations.length);
                     core.info("Clair report count: " + clairReport.count);
                     title = clairReport.annotations.length > 0
                         ? clairReport.annotations.length + " Vulnerabilities founds."
@@ -340,13 +350,13 @@ function run() {
                     core.info("\u2139\uFE0F Posting status '" + status_1 + "' with conclusion '" + conclusion + "' to " + link + " (sha: " + head_sha + ")");
                     summary +=
                         "\nTotal: Vulnerabilities: 603" +
-                            "\n\t 💥 Defcon1 Vulnerabilities: 0 " +
-                            "\n\t 🔥 Critical Vulnerabilities: 0 " +
-                            "\n\t 💢 High Vulnerabilities: 4 " +
-                            "\n\t ☀ Medium Vulnerabilities: 192" +
-                            "\n\t ☔ Low Vulnerabilities: 277" +
-                            "\n\t ☁ Negligible Vulnerabilities: 130" +
-                            "\n\t 🌊 Unknown Vulnerabilities: 0";
+                            "\n\t 💥 Defcon1 Vulnerabilities: " + clairReport.summaryVulnerabilities.get("DefCon1") +
+                            "\n\t 🔥 Critical Vulnerabilities: " + clairReport.summaryVulnerabilities.get("Critical") +
+                            "\n\t 💢 High Vulnerabilities: " + clairReport.summaryVulnerabilities.get("High") +
+                            "\n\t ☀ Medium Vulnerabilities: " + clairReport.summaryVulnerabilities.get("Medium") +
+                            "\n\t ☔ Low Vulnerabilities: " + clairReport.summaryVulnerabilities.get("Low") +
+                            "\n\t ☁ Negligible Vulnerabilities: " + clairReport.summaryVulnerabilities.get("Negligible") +
+                            "\n\t 🌊 Unknown Vulnerabilities: " + clairReport.summaryVulnerabilities.get("Unknown");
                     createCheckRequest = __assign(__assign({}, github.context.repo), { name: checkName, head_sha: head_sha, status: status_1, conclusion: conclusion, output: {
                             title: title,
                             summary: summary,

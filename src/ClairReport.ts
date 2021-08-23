@@ -6,20 +6,43 @@ import * as fs from 'fs';
  * Scanner Report
  */
 export interface ScannerReport {
+
+    /**
+     * Total number  of Vulnerabilities
+     */
     count: number
-    skipped: number
+    summaryVulnerabilities: Map<string, number>
     annotations: Annotation[]
 }
 
+/**
+ * Represent an GitHub annotation
+ */
 export interface Annotation {
+    /**
+     * Vulnerabilitie Link
+     */
     path: string
     start_line: number
     end_line: number
     start_column: number
     end_column: number
-    annotation_level: string //'failure' | 'notice' | 'warning'
+    /**
+     * Annotation Level
+     * 'failure' | 'notice' | 'warning'
+     */
+    annotation_level: string
+    /**
+     * Title
+     */
     title: string
+    /**
+     * Message
+     */
     message: string
+    /**
+     * Vulnerability description
+     */
     raw_details: string
 }
 
@@ -43,9 +66,6 @@ export async function parseScannerReports(
 export async function parseFile(
     file: string,
     severity: SeverityStrings): Promise<ScannerReport> {
-    let annotations: Annotation[] = []
-    let count = 0
-    let skipped = 0
     core.info(`Parsing file ${file}`)
     const data: string = fs.readFileSync(file, 'utf8');
     const parseJson = require('parse-json');
@@ -62,15 +82,27 @@ export async function parseFile(
  * @param vulnerabilities
  */
 async function parseVulnerability(
-    /* eslint-disable  @typescript-eslint/no-explicit-any */
     vulnerabilities: any,
     severityLevel: SeverityStrings
 ): Promise<ScannerReport> {
-    let count = 0
-    let skipped = 0
+
+    let count: number = 0/*, unknown: number = 0, negligible: number = 0,
+        low: number = 0, medium: number = 0, high: number = 0,
+        critical: number = 0, defcon1: number = 0*/
+
+    let summaryVulnerabilities = new Map<string, number>();
+    summaryVulnerabilities.set("Unknown",0)
+    summaryVulnerabilities.set("Negligible",0)
+    summaryVulnerabilities.set("Low",0)
+    summaryVulnerabilities.set("Medium",0)
+    summaryVulnerabilities.set("High",0)
+    summaryVulnerabilities.set("Critical",0)
+    summaryVulnerabilities.set("Defcon1",0)
+
     const annotations: Annotation[] = []
     core.info("Vulneraibility is " + vulnerabilities)
     for (let vuln in vulnerabilities) {
+        count++
         if (vulnerabilities.hasOwnProperty(vuln)) {
             const version = (vulnerabilities[vuln]["package"]["version"]) != "" ? (":" + (vulnerabilities[vuln]["package"]["version"])) : "";
             const packageName = (vulnerabilities[vuln]["package"]["name"] + version);
@@ -79,6 +111,8 @@ async function parseVulnerability(
             const links: string = (vulnerabilities[vuln]["links"]);
             const reference: string = (vulnerabilities[vuln]["links"])[0];
             const severity: SeverityStrings = (vulnerabilities[vuln]["normalized_severity"]);
+            //@ts-ignore
+            summaryVulnerabilities.set(severity, groupsMap.get(severity)+1)
             const fixed_resolved = (vulnerabilities[vuln]["fixed_in_version"]);
 
             if (Severity[severity] >= Severity[severityLevel]) {
@@ -89,8 +123,8 @@ async function parseVulnerability(
                     start_column: 0,
                     end_column: 0,
                     annotation_level: await mappingSeverity(severity),
-                    title: (version.length>0)?( packageName + " [ " + version + " ]"):packageName,
-                    message:  (fixed_resolved.length>0)?( name + " \nFixed Resolved in: [ " + fixed_resolved + " ]"):name,
+                    title: (version.length > 0) ? (packageName + " [ " + version + " ]") : packageName,
+                    message: (fixed_resolved.length > 0) ? (name + " \nFixed Resolved in: [ " + fixed_resolved + " ]") : name,
                     raw_details: description
                 })
             }
@@ -98,7 +132,7 @@ async function parseVulnerability(
         }
     }
     core.info("Annotations is: " + annotations.length)
-    return {count, skipped, annotations}
+    return {count, summaryVulnerabilities, annotations}
 }
 
 /**
@@ -127,6 +161,9 @@ export async function mappingSeverity(severity: string): Promise<string> {
     }
 }
 
+/**
+ * Severity Clair
+ */
 export enum Severity {
     Unknown,
     Negligible,
@@ -137,8 +174,9 @@ export enum Severity {
     Defcon1
 
 }
+
 /**
  * This is equivalent to:
- * type LogLevelStrings = 'ERROR' | 'WARN' | 'INFO' | 'DEBUG';
+ * type SeverityStrings = 'Unknown' | 'Negligible' | 'Low' | 'Medium' | 'High' | 'Critical' | 'Defcon1' ;
  */
 export type SeverityStrings = keyof typeof Severity;

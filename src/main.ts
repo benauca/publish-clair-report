@@ -28,8 +28,8 @@ export async function run(): Promise<void> {
         core.startGroup(` Process Scan Reports...`)
         // @ts-ignore
         const clairReport = await parseScannerReports(reportPaths, severityLevel);
-        const vulnerabilities = clairReport.count > 0 || clairReport.skipped > 0;
-        core.info(`Vulnerabilities: ` + clairReport.annotations.length)
+        const vulnerabilities = clairReport.count > 0;
+        core.info(`Total Vulnerabilities: ` + clairReport.annotations.length)
         core.info(`Clair report count: ` + clairReport.count)
         const title = clairReport.annotations.length > 0
             ? `${clairReport.annotations.length} Vulnerabilities founds.`
@@ -57,13 +57,13 @@ export async function run(): Promise<void> {
 
         summary +=
             "\nTotal: Vulnerabilities: 603" +
-            "\n\t 💥 Defcon1 Vulnerabilities: 0 " +
-            "\n\t 🔥 Critical Vulnerabilities: 0 " +
-            "\n\t 💢 High Vulnerabilities: 4 " +
-            "\n\t ☀ Medium Vulnerabilities: 192" +
-            "\n\t ☔ Low Vulnerabilities: 277" +
-            "\n\t ☁ Negligible Vulnerabilities: 130" +
-            "\n\t 🌊 Unknown Vulnerabilities: 0"
+            "\n\t 💥 Defcon1 Vulnerabilities: " + clairReport.summaryVulnerabilities.get("DefCon1") +
+            "\n\t 🔥 Critical Vulnerabilities: " + clairReport.summaryVulnerabilities.get("Critical") +
+            "\n\t 💢 High Vulnerabilities: " + clairReport.summaryVulnerabilities.get("High") +
+            "\n\t ☀ Medium Vulnerabilities: " + clairReport.summaryVulnerabilities.get("Medium") +
+            "\n\t ☔ Low Vulnerabilities: " + clairReport.summaryVulnerabilities.get("Low") +
+            "\n\t ☁ Negligible Vulnerabilities: " + clairReport.summaryVulnerabilities.get("Negligible") +
+            "\n\t 🌊 Unknown Vulnerabilities: " + clairReport.summaryVulnerabilities.get("Unknown")
 
         const createCheckRequest = {
             ...github.context.repo,
