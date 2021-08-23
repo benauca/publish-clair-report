@@ -57,7 +57,7 @@ export async function run(): Promise<void> {
 
         summary +=
             "\nTotal: Vulnerabilities: 603" +
-            "\n\t 💥 Defcon1 Vulnerabilities: " + clairReport.summaryVulnerabilities.get("DefCon1") +
+            "\n\t 💥 Defcon1 Vulnerabilities: " + clairReport.summaryVulnerabilities.get("Defcon1") +
             "\n\t 🔥 Critical Vulnerabilities: " + clairReport.summaryVulnerabilities.get("Critical") +
             "\n\t 💢 High Vulnerabilities: " + clairReport.summaryVulnerabilities.get("High") +
             "\n\t ☀ Medium Vulnerabilities: " + clairReport.summaryVulnerabilities.get("Medium") +

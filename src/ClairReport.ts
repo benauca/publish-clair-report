@@ -1,4 +1,5 @@
 import * as core from '@actions/core';
+import * as glob from '@actions/glob';
 import * as fs from 'fs';
 
 
@@ -46,6 +47,7 @@ export interface Annotation {
     raw_details: string
 }
 
+
 /**
  * Parser Scanner Reports
  * @param reportPaths Location path reports
@@ -55,7 +57,9 @@ export async function parseScannerReports(
     reportPaths: string,
     level: SeverityStrings
 ): Promise<ScannerReport> {
-    return await parseFile(reportPaths, level)
+    const globber = await glob.create(reportPaths, {followSymbolicLinks: false})
+    const file = await globber.glob()
+    return await parseFile(file[0], level)
 }
 
 /**
