@@ -1,0 +1,66 @@
+{
+  "manifest_hash": "sha256:881afbae521c910f764f7187dbfbca3cc10c26f8bafa458c76dda009a901c29d",
+  "packages" : {},
+  "distributions": {},
+  "repository": {},
+  "vulnerabilities": {
+    "75160": {
+      "id": "75160",
+      "updater": "ubuntu-trusty-updater",
+      "name": "CVE-2015-5276 on Ubuntu 14.04 LTS (trusty) - High.",
+      "description": "The std::random_device class in libstdc++ in the GNU Compiler Collection (aka GCC) before 4.9.4 does not properly handle short reads from blocking sources, which makes it easier for context-dependent attackers to predict the random values via unspecified vectors.",
+      "issued": "0001-01-01T00:00:00Z",
+      "links": "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-5276 http://people.canonical.com/~ubuntu-security/cve/2015/CVE-2015-5276.html https://gcc.gnu.org/ml/gcc-patches/2015-09/msg01050.html https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65142",
+      "severity": "",
+      "normalized_severity": "High",
+      "package": {
+        "id": "",
+        "name": "libstdc++6",
+        "version": "1.0",
+        "kind": "binary"
+      },
+      "distribution": {
+        "id": "",
+        "did": "ubuntu",
+        "name": "Ubuntu",
+        "version": "14.04.6 LTS, Trusty Tahr",
+        "version_code_name": "",
+        "version_id": "14.04",
+        "arch": "",
+        "cpe": "",
+        "pretty_name": "Ubuntu 14.04.6 LTS"
+      },
+      "repository": {},
+      "fixed_in_version": ""
+    },
+    "99999": {
+      "id": "99999",
+      "updater": "ubuntu-trusty-updater",
+      "name": "CVE-2015-5276 on Ubuntu 14.04 LTS (trusty) - High.",
+      "description": "The std::random_device class in libstdc++ in the GNU Compiler Collection (aka GCC) before 4.9.4 does not properly handle short reads from blocking sources, which makes it easier for context-dependent attackers to predict the random values via unspecified vectors.",
+      "issued": "0001-01-01T00:00:00Z",
+      "links": "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-5276 http://people.canonical.com/~ubuntu-security/cve/2015/CVE-2015-5276.html https://gcc.gnu.org/ml/gcc-patches/2015-09/msg01050.html https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65142",
+      "severity": "",
+      "normalized_severity": "High",
+      "package": {
+        "id": "",
+        "name": "libstdc++6",
+        "version": "",
+        "kind": "binary"
+      },
+      "distribution": {
+        "id": "",
+        "did": "ubuntu",
+        "name": "Ubuntu",
+        "version": "14.04.6 LTS, Trusty Tahr",
+        "version_code_name": "",
+        "version_id": "14.04",
+        "arch": "",
+        "cpe": "",
+        "pretty_name": "Ubuntu 14.04.6 LTS"
+      },
+      "repository": {},
+      "fixed_in_version": "0:1.0.1f-1ubuntu2.27+esm2"
+    }
+  }
+}

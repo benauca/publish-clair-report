@@ -1,3 +1,5 @@
+//@ts-ignore
+import parseJson = require('parse-json');
 import * as core from '@actions/core';
 import * as glob from '@actions/glob';
 import * as fs from 'fs';
@@ -58,8 +60,9 @@ export async function parseScannerReports(
     level: SeverityStrings
 ): Promise<ScannerReport> {
     const globber = await glob.create(reportPaths, {followSymbolicLinks: false})
-    const file = await globber.glob()
-    return await parseFile(file[0], level)
+    const file = await globber.glob();
+
+    return await parseFile(file.length > 0 ? file[0] : reportPaths, level)
 }
 
 /**
@@ -67,16 +70,15 @@ export async function parseScannerReports(
  * @param file, Clair report as Json file
  * @param severity, Severity
  */
-export async function parseFile(
+async function parseFile(
     file: string,
     severity: SeverityStrings): Promise<ScannerReport> {
     core.info(`Parsing file ${file}`)
     const data: string = fs.readFileSync(file, 'utf8');
-    const parseJson = require('parse-json');
     const report = parseJson(data);
     const vulnerabilities = report['vulnerabilities'];
 
-    return await parseVulnerability(vulnerabilities, severity)
+    return await parseVulnerability(vulnerabilities, severity);
 
 }
 
@@ -90,33 +92,30 @@ async function parseVulnerability(
     severityLevel: SeverityStrings
 ): Promise<ScannerReport> {
 
-    let count: number = 0/*, unknown: number = 0, negligible: number = 0,
-        low: number = 0, medium: number = 0, high: number = 0,
-        critical: number = 0, defcon1: number = 0*/
-
+    let count: number = 0;
     let summaryVulnerabilities = new Map<string, number>();
-    summaryVulnerabilities.set("Unknown",0)
-    summaryVulnerabilities.set("Negligible",0)
-    summaryVulnerabilities.set("Low",0)
-    summaryVulnerabilities.set("Medium",0)
-    summaryVulnerabilities.set("High",0)
-    summaryVulnerabilities.set("Critical",0)
-    summaryVulnerabilities.set("Defcon1",0)
+    summaryVulnerabilities.set("Unknown", 0)
+    summaryVulnerabilities.set("Negligible", 0)
+    summaryVulnerabilities.set("Low", 0)
+    summaryVulnerabilities.set("Medium", 0)
+    summaryVulnerabilities.set("High", 0)
+    summaryVulnerabilities.set("Critical", 0)
+    summaryVulnerabilities.set("Defcon1", 0)
 
     const annotations: Annotation[] = []
     core.info("Vulneraibility is " + vulnerabilities)
     for (let vuln in vulnerabilities) {
         count++
         if (vulnerabilities.hasOwnProperty(vuln)) {
-            const version = (vulnerabilities[vuln]["package"]["version"]) != "" ? (":" + (vulnerabilities[vuln]["package"]["version"])) : "";
-            const packageName = (vulnerabilities[vuln]["package"]["name"] + version);
+            const version = (vulnerabilities[vuln]["package"]["version"]) != "" ? (vulnerabilities[vuln]["package"]["version"]) : "";
+            const packageName = (vulnerabilities[vuln]["package"]["name"]);
             const name = (vulnerabilities[vuln]["name"]);
             const description: string = (vulnerabilities[vuln]["description"]);
             const links: string = (vulnerabilities[vuln]["links"]);
             const reference: string = (vulnerabilities[vuln]["links"])[0];
             const severity: SeverityStrings = (vulnerabilities[vuln]["normalized_severity"]);
             //@ts-ignore
-            summaryVulnerabilities.set(severity, summaryVulnerabilities.get(severity)+1)
+            summaryVulnerabilities.set(severity, summaryVulnerabilities.get(severity) + 1)
             const fixed_resolved = (vulnerabilities[vuln]["fixed_in_version"]);
 
             if (Severity[severity] >= Severity[severityLevel]) {
@@ -144,7 +143,7 @@ async function parseVulnerability(
  * 'failure' | 'notice' | 'warning'
  * @param severity
  */
-export async function mappingSeverity(severity: string): Promise<string> {
+async function mappingSeverity(severity: string): Promise<string> {
     switch (severity.toLowerCase()) {
         case "unknown":
             return 'notice'
