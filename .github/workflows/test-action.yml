@@ -11,7 +11,7 @@ jobs:
       - name: Publish Clair Scan
         uses: ./
         with:
-          report_paths: assets/clair-report/ubuntu-14.04.local.json
+          report_paths: assets/clair-report/test-without-vulnerabilities.json
           check_name: ' 📄  Results Clair Scan'
           summary: 'Results Clair Scan for image ubuntu-14.04.local'
           #severity_level: 'High'
