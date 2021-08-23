@@ -83,20 +83,33 @@ describe('parseScannerReports', () => {
         } = await parseScannerReports(
             "assets/clair-report/anotations-test01.json", "High");
         expect(annotations.length).toBe(2);
-        expect(annotations[0].annotation_level).toBe("failure")
-        expect(annotations[0].path).toBe("https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-5276");
-        expect(annotations[0].title).toBe("libstdc++6 [ 1.0 ]");
-        expect(annotations[0].message).toBe("CVE-2015-5276 on Ubuntu 14.04 LTS (trusty) - High.");
-
-
         expect(annotations[1].annotation_level).toBe("failure")
-        expect(annotations[1].title).toBe("libstdc++6");
         expect(annotations[1].path).toBe("https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-5276");
-        expect(annotations[1].message).toBe("CVE-2015-5276 on Ubuntu 14.04 LTS (trusty) - High. \n" +
+        expect(annotations[1].title).toBe("libstdc++6 [ 1.0 ]");
+        expect(annotations[1].message).toBe("CVE-2015-5276 on Ubuntu 14.04 LTS (trusty) - High.");
+
+
+        expect(annotations[0].annotation_level).toBe("failure")
+        expect(annotations[0].title).toBe("libstdc++6");
+        expect(annotations[0].path).toBe("https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-5276");
+        expect(annotations[0].message).toBe("CVE-2015-5276 on Ubuntu 14.04 LTS (trusty) - High. \n" +
             "Fixed Resolved in: [ 0:1.0.1f-1ubuntu2.27+esm2 ]");
-
-
     });
 
-
+    it('should get Annotations must be ordered by annotation_level', async () => {
+        const {
+            count,
+            summaryVulnerabilities,
+            annotations
+        } = await parseScannerReports(
+            "assets/clair-report/ubuntu*.json", "Low");
+        expect(annotations[0].annotation_level).toBe("failure");
+        expect(annotations[1].annotation_level).toBe("failure");
+        expect(annotations[2].annotation_level).toBe("failure");
+        expect(annotations[3].annotation_level).toBe("failure");
+        expect(annotations[4].annotation_level).toBe("notice");
+        expect(count).toBe(603);
+        expect(summaryVulnerabilities.size).toBe(7);
+        expect(annotations.length).toBe(473);
+    });
 });

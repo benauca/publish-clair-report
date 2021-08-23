@@ -35,7 +35,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Severity = exports.mappingSeverity = exports.parseFile = exports.parseScannerReports = void 0;
+exports.Severity = exports.parseScannerReports = void 0;
+//@ts-ignore
+const parseJson = __nccwpck_require__(9876);
 const core = __importStar(__nccwpck_require__(551));
 const glob = __importStar(__nccwpck_require__(337));
 const fs = __importStar(__nccwpck_require__(5747));
@@ -48,7 +50,7 @@ function parseScannerReports(reportPaths, level) {
     return __awaiter(this, void 0, void 0, function* () {
         const globber = yield glob.create(reportPaths, { followSymbolicLinks: false });
         const file = yield globber.glob();
-        return yield parseFile(file[0], level);
+        return yield parseFile(file.length > 0 ? file[0] : reportPaths, level);
     });
 }
 exports.parseScannerReports = parseScannerReports;
@@ -61,22 +63,18 @@ function parseFile(file, severity) {
     return __awaiter(this, void 0, void 0, function* () {
         core.info(`Parsing file ${file}`);
         const data = fs.readFileSync(file, 'utf8');
-        const parseJson = __nccwpck_require__(9876);
         const report = parseJson(data);
         const vulnerabilities = report['vulnerabilities'];
         return yield parseVulnerability(vulnerabilities, severity);
     });
 }
-exports.parseFile = parseFile;
 /**
  * Parser Vulnerability
  * @param vulnerabilities
  */
 function parseVulnerability(vulnerabilities, severityLevel) {
     return __awaiter(this, void 0, void 0, function* () {
-        let count = 0; /*, unknown: number = 0, negligible: number = 0,
-            low: number = 0, medium: number = 0, high: number = 0,
-            critical: number = 0, defcon1: number = 0*/
+        let count = 0;
         let summaryVulnerabilities = new Map();
         summaryVulnerabilities.set("Unknown", 0);
         summaryVulnerabilities.set("Negligible", 0);
@@ -90,8 +88,8 @@ function parseVulnerability(vulnerabilities, severityLevel) {
         for (let vuln in vulnerabilities) {
             count++;
             if (vulnerabilities.hasOwnProperty(vuln)) {
-                const version = (vulnerabilities[vuln]["package"]["version"]) != "" ? (":" + (vulnerabilities[vuln]["package"]["version"])) : "";
-                const packageName = (vulnerabilities[vuln]["package"]["name"] + version);
+                const version = (vulnerabilities[vuln]["package"]["version"]) != "" ? (vulnerabilities[vuln]["package"]["version"]) : "";
+                const packageName = (vulnerabilities[vuln]["package"]["name"]);
                 const name = (vulnerabilities[vuln]["name"]);
                 const description = (vulnerabilities[vuln]["description"]);
                 const links = (vulnerabilities[vuln]["links"]);
@@ -115,6 +113,7 @@ function parseVulnerability(vulnerabilities, severityLevel) {
                 }
             }
         }
+        annotations.sort((annotation, other) => (annotation.annotation_level > other.annotation_level) ? 1 : -1);
         core.info("Annotations is: " + annotations.length);
         return { count, summaryVulnerabilities, annotations };
     });
@@ -146,7 +145,6 @@ function mappingSeverity(severity) {
         }
     });
 }
-exports.mappingSeverity = mappingSeverity;
 /**
  * Severity Clair
  */
@@ -240,14 +238,14 @@ function run() {
             }
             const pullRequest = github.context.payload.pull_request;
             const link = (pullRequest && pullRequest.html_url) || github.context.ref;
-            const conclusion = vulnerabilities && clairReport.annotations.length === 0
+            const conclusion = vulnerabilities && (clairReport.annotations.filter(value => value.annotation_level === 'failure')).length == 0
                 ? 'success'
                 : 'failure';
             const status = 'completed';
             const head_sha = commit || (pullRequest && pullRequest.head.sha) || github.context.sha;
             core.info(`ℹ️ Posting status '${status}' with conclusion '${conclusion}' to ${link} (sha: ${head_sha})`);
             summary +=
-                "\nTotal: Vulnerabilities: 603" +
+                "\nTotal: Vulnerabilities: " + clairReport.count +
                     "\n\t 💥 Defcon1 Vulnerabilities: " + clairReport.summaryVulnerabilities.get("Defcon1") +
                     "\n\t 🔥 Critical Vulnerabilities: " + clairReport.summaryVulnerabilities.get("Critical") +
                     "\n\t 💢 High Vulnerabilities: " + clairReport.summaryVulnerabilities.get("High") +

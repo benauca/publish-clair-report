@@ -45,7 +45,7 @@ export async function run(): Promise<void> {
         const pullRequest = github.context.payload.pull_request
         const link = (pullRequest && pullRequest.html_url) || github.context.ref
         const conclusion: 'success' | 'failure' =
-            vulnerabilities && clairReport.annotations.length === 0
+            vulnerabilities && (clairReport.annotations.filter(value => value.annotation_level === 'failure')).length == 0
                 ? 'success'
                 : 'failure'
         const status: 'completed' = 'completed'
@@ -56,7 +56,7 @@ export async function run(): Promise<void> {
         )
 
         summary +=
-            "\nTotal: Vulnerabilities: 603" +
+            "\nTotal: Vulnerabilities: " + clairReport.count +
             "\n\t 💥 Defcon1 Vulnerabilities: " + clairReport.summaryVulnerabilities.get("Defcon1") +
             "\n\t 🔥 Critical Vulnerabilities: " + clairReport.summaryVulnerabilities.get("Critical") +
             "\n\t 💢 High Vulnerabilities: " + clairReport.summaryVulnerabilities.get("High") +

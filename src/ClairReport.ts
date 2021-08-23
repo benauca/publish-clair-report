@@ -134,6 +134,7 @@ async function parseVulnerability(
 
         }
     }
+    annotations.sort((annotation, other) => (annotation.annotation_level > other.annotation_level) ? 1 : -1)
     core.info("Annotations is: " + annotations.length)
     return {count, summaryVulnerabilities, annotations}
 }
