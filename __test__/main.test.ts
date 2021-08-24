@@ -8,10 +8,12 @@ import {parseScannerReports} from "../src/ClairReport";
 beforeEach(() => {
 
     jest.resetModules()
-    process.env['GITHUB_REPOSITORY'] = 'benauca/test'
+    process.env['GITHUB_REPOSITORY'] = 'benauca/test';
     process.env['INPUT_SEVERITY_LEVEL'] = 'High';
-    process.env['INPUT_REPORT_PATHS'] = 'assets/clair-report/ubuntu*.json'
-    process.env['INPUT_TOKEN'] = 'myToken'
+    process.env['INPUT_REPORT_PATHS'] = 'assets/clair-report/ubuntu*.json';
+    process.env['INPUT_TOKEN'] = 'myToken';
+    process.env['INPUT_FAIL_WITH_VULNERABILITIES'] = "false";
+
     github.context.payload = {
         action: 'opened',
         pull_request: {
@@ -32,8 +34,9 @@ afterEach(() => {
     delete process.env['INPUT_REPORT_PATHS'];
     delete process.env['INPUT_TOKEN'];
     delete process.env['GITHUB_REPOSITORY'];
-
+    delete process.env['INPUT_FAIL_WITH_VULNERABILITIES'];
 })
+
 describe('test main', () => {
     it('should outputs a debug message', async () => {
         const debugMock = jest.spyOn(core, 'info')
@@ -45,11 +48,17 @@ describe('test main', () => {
 
     })
 
-    it('should publish annotations in github', async () => {
+    it('should publish annotations in github status success with default conditions and exist high vulnerabilities', async () => {
+        const debugMock = jest.spyOn(core, 'info')
+        await run()
+        expect(debugMock).toHaveBeenCalledWith("ℹ️ Posting status 'completed' with conclusion 'success' to https://github.com/Codertocat (sha: ec26c3e57ca3a959ca5aad62de7213c562f8c821)");
+    });
+
+    it('should publish annotations in github status failure with fail_with_vulnerabilities true and exist high vulnerabilities', async () => {
+        process.env['INPUT_FAIL_WITH_VULNERABILITIES'] = "true";
         const debugMock = jest.spyOn(core, 'info')
         await run()
         expect(debugMock).toHaveBeenCalledWith("ℹ️ Posting status 'completed' with conclusion 'failure' to https://github.com/Codertocat (sha: ec26c3e57ca3a959ca5aad62de7213c562f8c821)");
-
     });
 
     it('should not found vulnerabilities', async () => {

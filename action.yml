@@ -25,6 +25,10 @@ inputs:
     description: 'Fail the build in case to find a severity hight vulnerability .'
     required: false
     default: 'false'
+  fail_with_vulnerabilities:
+    description: 'By default not failed if found vulnerabilities with severity >= High. If true Mark as failure if exist high vulnerabilities'
+    required: false
+    default: 'false'
   require_scans:
     description: 'Fail if no json scan is found.'
     required: false

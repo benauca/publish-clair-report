@@ -209,6 +209,7 @@ function run() {
             const token = core.getInput('token') ||
                 core.getInput('github_token') ||
                 process.env.GITHUB_TOKEN;
+            const failWithVulnerabilities = core.getInput("fail_with_vulnerabilities") === 'true';
             if (!token) {
                 core.setFailed('Token is mandatory to execute this action.');
                 return;
@@ -238,9 +239,9 @@ function run() {
             }
             const pullRequest = github.context.payload.pull_request;
             const link = (pullRequest && pullRequest.html_url) || github.context.ref;
-            const conclusion = vulnerabilities && (clairReport.annotations.filter(value => value.annotation_level === 'failure')).length == 0
-                ? 'success'
-                : 'failure';
+            const conclusion = failWithVulnerabilities && (clairReport.annotations.filter(value => value.annotation_level === 'failure')).length > 0
+                ? 'failure'
+                : 'success';
             const status = 'completed';
             const head_sha = commit || (pullRequest && pullRequest.head.sha) || github.context.sha;
             core.info(`ℹ️ Posting status '${status}' with conclusion '${conclusion}' to ${link} (sha: ${head_sha})`);
@@ -267,7 +268,7 @@ function run() {
                 const octokit = github.getOctokit(token);
                 yield octokit.rest.checks.create(createCheckRequest);
                 if (failOnFailure && conclusion === 'failure') {
-                    core.setFailed(`Vulneraabilites reported ${clairReport.annotations.length} failures`);
+                    core.setFailed(`Vulnerabilities reported ${clairReport.annotations.length} failures`);
                 }
             }
             catch (error) {

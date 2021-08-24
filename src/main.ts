@@ -13,6 +13,8 @@ export async function run(): Promise<void> {
             core.getInput('github_token') ||
             process.env.GITHUB_TOKEN
 
+        const failWithVulnerabilities: boolean = core.getInput("fail_with_vulnerabilities") === 'true'
+
         if (!token) {
             core.setFailed('Token is mandatory to execute this action.')
             return
@@ -45,9 +47,9 @@ export async function run(): Promise<void> {
         const pullRequest = github.context.payload.pull_request
         const link = (pullRequest && pullRequest.html_url) || github.context.ref
         const conclusion: 'success' | 'failure' =
-            vulnerabilities && (clairReport.annotations.filter(value => value.annotation_level === 'failure')).length == 0
-                ? 'success'
-                : 'failure'
+            failWithVulnerabilities && (clairReport.annotations.filter(value => value.annotation_level === 'failure')).length > 0
+                ? 'failure'
+                : 'success'
         const status: 'completed' = 'completed'
         const head_sha =
             commit || (pullRequest && pullRequest.head.sha) || github.context.sha
@@ -88,7 +90,7 @@ export async function run(): Promise<void> {
 
             if (failOnFailure && conclusion === 'failure') {
                 core.setFailed(
-                    `Vulneraabilites reported ${clairReport.annotations.length} failures`
+                    `Vulnerabilities reported ${clairReport.annotations.length} failures`
                 )
             }
         } catch (error) {
