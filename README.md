@@ -24,8 +24,7 @@ report available before uploading it to Harbor.
 
 ## Workflow Configuration
 
-```
-
+```yaml
   name: publish
   on:
     pull_request:
@@ -56,8 +55,7 @@ report available before uploading it to Harbor.
 | `check_name`      | **False**     | `Scan Report`             | Check name to use when creating a check run.                                                       |
 | `fail_on_failure` | **False**     | `false`                   | Fail the action in case of a test failure.                                                         |
 | `require_scan`    | **False**     | `false`                   | Fail if no report are found.                                                                       |
-| `summary       `  | **False**     | `no`                      | Additional text to summary output                                                                  |
-
+| `summary`         | **False**     | `no`                      | Additional text to summary output                                                                  |
 
 ## Build
 
@@ -75,27 +73,24 @@ $ npm run build && npm run package
 # Run the tests, use to debug, and test it out
 $ npm test
 ```
+
 ## Lint
 
 ```bash
-
 # Verify lint is happy
 $ npm run lint -- --fix
-
 ```
 
-For the markdown file 
+For the markdown file
 
 ```bash
-
 npm install -g markdownlint-cli@0.25.0
-
+npm install -g markdown-link-check
+ 
 markdownlint '**/*.md' -c .github/config/lint-config.yml
 markdown-link-check '**/*.md' -c .github/config/mlc_config.json
-
 ```
 
-Links
-===
+# Links
 
 - [Working With Github actions](https://jeffrafter.com/working-with-github-actions/)

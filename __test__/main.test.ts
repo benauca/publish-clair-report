@@ -3,6 +3,7 @@ import * as github from '@actions/github'
 import {WebhookPayload} from '@actions/github/lib/interfaces'
 //const fixtures = require("@octokit/fixtures");
 import {run} from '../src/main'
+import {parseScannerReports} from "../src/ClairReport";
 
 beforeEach(() => {
 
@@ -75,5 +76,14 @@ describe('test main', () => {
         const debugMock = jest.spyOn(core, 'setFailed')
         await run()
         expect(debugMock).toHaveBeenCalledWith("ENOENT: no such file or directory, open 'assets/clair-report/not_found.json'");
+    });
+
+    it('should fail with file not valid ', async () => {
+        const expected:string = "Unexpected token \"H\" (0x48) in JSON at position 0 while parsing near";
+        process.env['INPUT_REPORT_PATHS'] = 'assets/clair-report/ExistButNotValidFile.json'
+        process.env['INPUT_SEVERITY_LEVEL'] = 'Negligible';
+        const debugMock = jest.spyOn(core, 'setFailed')
+        await run()
+        expect(debugMock).toHaveBeenCalledTimes(1);
     });
 })
