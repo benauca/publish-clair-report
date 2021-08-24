@@ -15,3 +15,4 @@ jobs:
           check_name: ' 📄  Results Clair Scan'
           summary: 'Results Clair Scan for image ubuntu-14.04.local'
           severity_level: 'Medium'
+          fail_with_vulnerabilities: 'true'
