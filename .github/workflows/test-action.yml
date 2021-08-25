@@ -11,7 +11,7 @@ jobs:
       - name: Publish Clair Scan
         uses: ./
         with:
-          report_paths: assets/clair-report/ubuntu*.json
-          fail_on_failure: "true"
+          report_paths: assets/clair-report/_______.json
+          requiredScan: "true"
 
 
