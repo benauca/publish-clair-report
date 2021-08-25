@@ -4,32 +4,41 @@ import {parseScannerReports} from "./ClairReport";
 
 export async function run(): Promise<void> {
 
+    const checkName = core.getInput('check_name')
+    const commit = core.getInput('commit')
+    const failOnFailure: boolean = core.getInput('fail_on_failure') === 'true'
+    const requireScans: boolean = core.getInput('require_scans') === 'true'
+    const severityLevel = core.getInput('severity_level')
+
     try {
         core.startGroup(` Getting input values`);
         let summary = core.getInput('summary')
         const reportPaths = core.getInput('report_paths')
+        core.info("Filter By security: " + severityLevel)
+
         const token =
             core.getInput('token') ||
             core.getInput('github_token') ||
             process.env.GITHUB_TOKEN
 
         const failWithVulnerabilities: boolean = core.getInput("fail_with_vulnerabilities") === 'true'
-
         if (!token) {
             core.setFailed('Token is mandatory to execute this action.')
             return
         }
-        const checkName = core.getInput('check_name')
-        const commit = core.getInput('commit')
-        const failOnFailure: boolean = core.getInput('fail_on_failure') === 'true'
-        const requireScans: boolean = core.getInput('require_scans') === 'true'
-        const severityLevel = core.getInput('severity_level')
-        core.info("Filter By security: " + severityLevel)
         core.endGroup()
 
         core.startGroup(` Process Scan Reports...`)
-        // @ts-ignore
-        const clairReport = await parseScannerReports(reportPaths, severityLevel);
+        let clairReport
+        try {
+            // @ts-ignore
+            clairReport = await parseScannerReports(reportPaths, severityLevel)
+        }catch (error) {
+            if(requireScans){
+                core.setFailed(error.message)
+            }
+            return
+        }
         const vulnerabilities = clairReport.count > 0;
         core.info(`Total Vulnerabilities: ` + clairReport.annotations.length)
         core.info(`Clair report count: ` + clairReport.count)

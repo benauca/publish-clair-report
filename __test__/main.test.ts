@@ -13,6 +13,7 @@ beforeEach(() => {
     process.env['INPUT_REPORT_PATHS'] = 'assets/clair-report/ubuntu*.json';
     process.env['INPUT_TOKEN'] = 'myToken';
     process.env['INPUT_FAIL_WITH_VULNERABILITIES'] = "false";
+    process.env['INPUT_REQUIRE_SCANS'] = "false";
 
     github.context.payload = {
         action: 'opened',
@@ -35,6 +36,8 @@ afterEach(() => {
     delete process.env['INPUT_TOKEN'];
     delete process.env['GITHUB_REPOSITORY'];
     delete process.env['INPUT_FAIL_WITH_VULNERABILITIES'];
+    delete process.env['INPUT_REQUIRE_SCANS'];
+
 })
 
 describe('test main', () => {
@@ -81,18 +84,35 @@ describe('test main', () => {
     it('should finish ko if require_scan and report not found', async () => {
         process.env['INPUT_REPORT_PATHS'] = 'assets/clair-report/not_found.json'
         process.env['INPUT_SEVERITY_LEVEL'] = 'Negligible';
-        process.env['INPUT_REQUIRE_SCAN'] = 'true';
+        process.env['INPUT_REQUIRE_SCANS'] = 'true';
         const debugMock = jest.spyOn(core, 'setFailed')
         await run()
         expect(debugMock).toHaveBeenCalledWith("ENOENT: no such file or directory, open 'assets/clair-report/not_found.json'");
     });
 
-    it('should fail with file not valid ', async () => {
+    it('should finish OK if not require_scan and report not found', async () => {
+        process.env['INPUT_REPORT_PATHS'] = 'assets/clair-report/not_found.json'
+        process.env['INPUT_SEVERITY_LEVEL'] = 'Negligible';
+        const debugMock = jest.spyOn(core, 'setFailed')
+        await run()
+    });
+
+    it('should fail with file not valid and require scans true', async () => {
+        const expected:string = "Unexpected token \"H\" (0x48) in JSON at position 0 while parsing near";
+        process.env['INPUT_REPORT_PATHS'] = 'assets/clair-report/ExistButNotValidFile.json'
+        process.env['INPUT_SEVERITY_LEVEL'] = 'Negligible';
+        process.env['INPUT_REQUIRE_SCANS'] = 'true';
+        const debugMock = jest.spyOn(core, 'setFailed')
+        await run()
+        expect(debugMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('should finish ok with file not valid and require scans false', async () => {
         const expected:string = "Unexpected token \"H\" (0x48) in JSON at position 0 while parsing near";
         process.env['INPUT_REPORT_PATHS'] = 'assets/clair-report/ExistButNotValidFile.json'
         process.env['INPUT_SEVERITY_LEVEL'] = 'Negligible';
         const debugMock = jest.spyOn(core, 'setFailed')
         await run()
-        expect(debugMock).toHaveBeenCalledTimes(1);
+        expect(debugMock).toHaveBeenCalledTimes(0);
     });
 })
