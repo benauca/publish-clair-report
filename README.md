@@ -13,6 +13,7 @@
 3. [Build](.#build)
 4. [Test](.#test)
 5. [Lint](.#lint)
+6. [Examples](.#examples)
 
 # Introduction
 
@@ -47,15 +48,16 @@ report available before uploading it to Harbor.
 
 ## Inputs
 
-| **Input**         | **Required**  | **Default**               | **Description**                                                                                           |
-|:---------------   |:-----         |:--------                  |:---------------------------------------------------------------------------------------------------|
-| `report_paths`    | **True**      | `no`                      | Clair report paths.                                                                                |
-| `severity_level`  | **False**     | `High`                    | Clair Severity level for Filter `Unknown` `Negligible` `Low` `Medium` `High` `Critical` `Defcon1`  |
-| `token`           | **False**     | `${{ github.token }}`     | GitHub token for creating a check run.                                                             |
-| `check_name`      | **False**     | `Scan Report`             | Check name to use when creating a check run.                                                       |
-| `fail_on_failure` | **False**     | `false`                   | Fail the action in case of a test failure.                                                         |
-| `require_scan`    | **False**     | `false`                   | Fail if no report are found.                                                                       |
-| `summary`         | **False**     | `no`                      | Additional text to summary output                                                                  |
+| **Input**                   | **Required**  | **Default**               | **Description**                                                                                           |
+|:---------------             |:-----         |:--------                  |:---------------------------------------------------------------------------------------------------|
+| `report_paths`              | **True**      | `no`                      | Clair report paths.                                                                                |
+| `severity_level`            | **False**     | `High`                    | Clair Severity level for Filter `Unknown` `Negligible` `Low` `Medium` `High` `Critical` `Defcon1`  |
+| `token`                     | **False**     | `${{ github.token }}`     | GitHub token for creating a check run.                                                             |
+| `check_name`                | **False**     | `Scan Report`             | Check name to use when creating a check run.                                                       |
+| `fail_with_vulnerabilities` | **False**     | `true`                    | By default always finish with status true.                                                       |
+| `fail_on_failure`           | **False**     | `false`                   | Fail the action in case of a test failure.                                                         |
+| `require_scan`              | **False**     | `false`                   | Fail if no report are found.                                                                       |
+| `summary`                   | **False**     | `no`                      | Additional text to summary output                                                                  |
 
 ## Build
 
@@ -94,3 +96,31 @@ markdown-link-check '**/*.md' -c .github/config/mlc_config.json
 # Links
 
 - [Working With Github actions](https://jeffrafter.com/working-with-github-actions/)
+
+# Examples
+
+- Only publish 50 annotations. 
+- Only parsers json file.
+
+## By Default
+
+
+## Finish with status Failed if 
+
+By default, it always ends with status success even if it finds vulnerabilities
+with criticality higher than High. If we want to indicate the failed state of
+the analysis we must mark true the condition `fail_with_vulnerabilities`
+
+```yaml
+- name: Publish Scan Report
+  uses: santander-group/publish-clair-report@v1
+  if: always() # always run even if the previous step fails
+  with:
+    report_paths: assets/clair-report/ubuntu*.json
+    fail_with_vulnerabilities: 'true'
+    check_name: ' 📄  Results Clair Scan'
+    summary: 'Results Clair Scan for image ubuntu-14.04.local'
+    severity_level: 'Medium'
+```
+
+
