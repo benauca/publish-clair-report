@@ -202,10 +202,16 @@ const github = __importStar(__nccwpck_require__(6151));
 const ClairReport_1 = __nccwpck_require__(723);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        const checkName = core.getInput('check_name');
+        const commit = core.getInput('commit');
+        const failOnFailure = core.getInput('fail_on_failure') === 'true';
+        const requireScans = core.getInput('require_scans') === 'true';
+        const severityLevel = core.getInput('severity_level');
         try {
             core.startGroup(` Getting input values`);
             let summary = core.getInput('summary');
             const reportPaths = core.getInput('report_paths');
+            core.info("Filter By security: " + severityLevel);
             const token = core.getInput('token') ||
                 core.getInput('github_token') ||
                 process.env.GITHUB_TOKEN;
@@ -214,16 +220,19 @@ function run() {
                 core.setFailed('Token is mandatory to execute this action.');
                 return;
             }
-            const checkName = core.getInput('check_name');
-            const commit = core.getInput('commit');
-            const failOnFailure = core.getInput('fail_on_failure') === 'true';
-            const requireScans = core.getInput('require_scans') === 'true';
-            const severityLevel = core.getInput('severity_level');
-            core.info("Filter By security: " + severityLevel);
             core.endGroup();
             core.startGroup(` Process Scan Reports...`);
-            // @ts-ignore
-            const clairReport = yield ClairReport_1.parseScannerReports(reportPaths, severityLevel);
+            let clairReport;
+            try {
+                // @ts-ignore
+                clairReport = yield ClairReport_1.parseScannerReports(reportPaths, severityLevel);
+            }
+            catch (error) {
+                if (requireScans) {
+                    core.setFailed(error.message);
+                }
+                return;
+            }
             const vulnerabilities = clairReport.count > 0;
             core.info(`Total Vulnerabilities: ` + clairReport.annotations.length);
             core.info(`Clair report count: ` + clairReport.count);
