@@ -6,7 +6,6 @@ export async function run(): Promise<void> {
 
     const checkName = core.getInput('check_name')
     const commit = core.getInput('commit')
-    const failOnFailure: boolean = core.getInput('fail_on_failure') === 'true'
     const requireScans: boolean = core.getInput('require_scans') === 'true'
     const severityLevel = core.getInput('severity_level')
 
@@ -34,6 +33,7 @@ export async function run(): Promise<void> {
             // @ts-ignore
             clairReport = await parseScannerReports(reportPaths, severityLevel)
         }catch (error) {
+            core.warning(error.message)
             if(requireScans){
                 core.setFailed(error.message)
             }
@@ -97,7 +97,7 @@ export async function run(): Promise<void> {
             const octokit = github.getOctokit(token)
             await octokit.rest.checks.create(createCheckRequest)
 
-            if (failOnFailure && conclusion === 'failure') {
+            if (conclusion === 'failure') {
                 core.setFailed(
                     `Vulnerabilities reported ${clairReport.annotations.length} failures`
                 )

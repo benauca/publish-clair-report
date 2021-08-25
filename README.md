@@ -55,7 +55,6 @@ report available before uploading it to Harbor.
 | `token`                     | **False**     | `${{ github.token }}`     | GitHub token for creating a check run.                                                             |
 | `check_name`                | **False**     | `Scan Report`             | Check name to use when creating a check run.                                                       |
 | `fail_with_vulnerabilities` | **False**     | `true`                    | By default always finish with status true.                                                       |
-| `fail_on_failure`           | **False**     | `false`                   | Fail the action in case of a test failure.                                                         |
 | `require_scan`              | **False**     | `false`                   | Fail if no report are found.                                                                       |
 | `summary`                   | **False**     | `no`                      | Additional text to summary output                                                                  |
 

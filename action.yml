@@ -21,10 +21,6 @@ inputs:
   commit:
     description: 'Commit SHA to update the check status.'
     required: false
-  fail_on_failure:
-    description: 'Fail the build in case to find a severity hight vulnerability .'
-    required: false
-    default: 'false'
   fail_with_vulnerabilities:
     description: 'By default not failed if found vulnerabilities with severity >= High. If true Mark as failure if exist high vulnerabilities'
     required: false

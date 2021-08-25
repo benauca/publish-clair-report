@@ -204,7 +204,6 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const checkName = core.getInput('check_name');
         const commit = core.getInput('commit');
-        const failOnFailure = core.getInput('fail_on_failure') === 'true';
         const requireScans = core.getInput('require_scans') === 'true';
         const severityLevel = core.getInput('severity_level');
         try {
@@ -228,6 +227,7 @@ function run() {
                 clairReport = yield ClairReport_1.parseScannerReports(reportPaths, severityLevel);
             }
             catch (error) {
+                core.warning(error.message);
                 if (requireScans) {
                     core.setFailed(error.message);
                 }
@@ -276,7 +276,7 @@ function run() {
             try {
                 const octokit = github.getOctokit(token);
                 yield octokit.rest.checks.create(createCheckRequest);
-                if (failOnFailure && conclusion === 'failure') {
+                if (conclusion === 'failure') {
                     core.setFailed(`Vulnerabilities reported ${clairReport.annotations.length} failures`);
                 }
             }
