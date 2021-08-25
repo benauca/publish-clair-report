@@ -12,6 +12,6 @@ jobs:
         uses: ./
         with:
           report_paths: assets/clair-report/_______.json
-          require_scans: "true"
+          require_scans: "false"
 
 
