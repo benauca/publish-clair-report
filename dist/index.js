@@ -113,7 +113,11 @@ function parseVulnerability(vulnerabilities, severityLevel) {
                 }
             }
         }
-        annotations.sort((annotation, other) => (annotation.annotation_level > other.annotation_level) ? 1 : -1);
+        const severityMap = new Map();
+        severityMap.set('notice', 3);
+        severityMap.set('warning', 2);
+        severityMap.set('failure', 1);
+        annotations.sort((annotation, other) => (severityMap.get(annotation.annotation_level) > severityMap.get(other.annotation_level)) ? 1 : -1);
         core.info("Annotations is: " + annotations.length);
         return { count, summaryVulnerabilities, annotations };
     });
@@ -206,6 +210,7 @@ function run() {
         const commit = core.getInput('commit');
         const requireScans = core.getInput('require_scans') === 'true';
         const severityLevel = core.getInput('severity_level');
+        const publishSummary = core.getInput('publish_summary') === 'true';
         try {
             core.startGroup(` Getting input values`);
             let summary = core.getInput('summary');

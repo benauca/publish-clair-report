@@ -130,7 +130,7 @@ describe('parseScannerReports', () => {
         expect(annotations[1].annotation_level).toBe("failure");
         expect(annotations[2].annotation_level).toBe("failure");
         expect(annotations[3].annotation_level).toBe("failure");
-        expect(annotations[4].annotation_level).toBe("notice");
+        expect(annotations[4].annotation_level).toBe("warning");
         expect(count).toBe(603);
         expect(summaryVulnerabilities.size).toBe(7);
         expect(annotations.length).toBe(473);

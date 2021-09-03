@@ -11,8 +11,9 @@ jobs:
       - name: Publish Clair Scan
         uses: ./
         with:
-          report_paths: assets/clair-report/_______.json
+          report_paths: assets/clair-report/without-securityLevel-vulnerabilities.json
           require_scans: true
+          severity_level: 'High'
 
 
 
