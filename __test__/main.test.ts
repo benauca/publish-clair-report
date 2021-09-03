@@ -68,7 +68,7 @@ describe('test main', () => {
         process.env['INPUT_REPORT_PATHS'] = 'assets/clair-report/should_finish_success_if_not_exist_vulnerabilities.json'
         const debugMock = jest.spyOn(core, 'info')
         await run()
-        expect(debugMock).toHaveBeenCalledWith("No Vulnerabilities found!");
+        expect(debugMock).toHaveBeenCalledWith("No Vulnerabilities found with level High or higher!.");
 
     });
 

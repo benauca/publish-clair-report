@@ -12,7 +12,7 @@ jobs:
         uses: ./
         with:
           report_paths: assets/clair-report/without-securityLevel-vulnerabilities.json
-          #publish_summary: true
+          publish_summary: 'true'
           severity_level: 'High'
 
 

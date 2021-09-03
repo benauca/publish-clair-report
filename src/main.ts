@@ -45,7 +45,7 @@ export async function run(): Promise<void> {
         core.info(`Clair report count: ` + clairReport.count)
         const title = clairReport.annotations.length > 0
             ? `${clairReport.annotations.length} Vulnerabilities founds.`
-            : 'No Vulnerabilities found with level ' + severityLevel +' or higher !.'
+            : 'No Vulnerabilities found with level ' + severityLevel +' or higher!.'
         core.info(`${title}`)
 
         const pullRequest = github.context.payload.pull_request
