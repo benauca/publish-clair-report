@@ -21,8 +21,8 @@ inputs:
   commit:
     description: 'Commit SHA to update the check status.'
     required: false
-  fail_on_failure:
-    description: 'Fail the build in case to find a severity hight vulnerability .'
+  fail_with_vulnerabilities:
+    description: 'By default not failed if found vulnerabilities with severity >= High. If true Mark as failure if exist high vulnerabilities'
     required: false
     default: 'false'
   require_scans:
@@ -37,6 +37,10 @@ inputs:
     description: 'Severity Level to publish scan'
     required: false
     default: 'High'
+  publish_summary:
+    description: 'Forced the Publication Summary'
+    required: false
+    default: 'false'
 runs:
   using: 'node12'
   main: 'dist/index.js'

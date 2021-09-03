@@ -113,7 +113,11 @@ function parseVulnerability(vulnerabilities, severityLevel) {
                 }
             }
         }
-        annotations.sort((annotation, other) => (annotation.annotation_level > other.annotation_level) ? 1 : -1);
+        const severityMap = new Map();
+        severityMap.set('notice', 3);
+        severityMap.set('warning', 2);
+        severityMap.set('failure', 1);
+        annotations.sort((annotation, other) => (severityMap.get(annotation.annotation_level) > severityMap.get(other.annotation_level)) ? 1 : -1);
         core.info("Annotations is: " + annotations.length);
         return { count, summaryVulnerabilities, annotations };
     });
@@ -202,45 +206,50 @@ const github = __importStar(__nccwpck_require__(6151));
 const ClairReport_1 = __nccwpck_require__(723);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        const checkName = core.getInput('check_name');
+        const commit = core.getInput('commit');
+        const requireScans = core.getInput('require_scans') === 'true';
+        const severityLevel = core.getInput('severity_level');
+        const publishSummary = core.getInput('publish_summary') === 'true';
         try {
             core.startGroup(` Getting input values`);
             let summary = core.getInput('summary');
             const reportPaths = core.getInput('report_paths');
+            core.info("Filter By security: " + severityLevel);
             const token = core.getInput('token') ||
                 core.getInput('github_token') ||
                 process.env.GITHUB_TOKEN;
+            const failWithVulnerabilities = core.getInput("fail_with_vulnerabilities") === 'true';
             if (!token) {
                 core.setFailed('Token is mandatory to execute this action.');
                 return;
             }
-            const checkName = core.getInput('check_name');
-            const commit = core.getInput('commit');
-            const failOnFailure = core.getInput('fail_on_failure') === 'true';
-            const requireScans = core.getInput('require_scans') === 'true';
-            const severityLevel = core.getInput('severity_level');
-            core.info("Filter By security: " + severityLevel);
             core.endGroup();
             core.startGroup(` Process Scan Reports...`);
-            // @ts-ignore
-            const clairReport = yield ClairReport_1.parseScannerReports(reportPaths, severityLevel);
+            let clairReport;
+            try {
+                // @ts-ignore
+                clairReport = yield ClairReport_1.parseScannerReports(reportPaths, severityLevel);
+            }
+            catch (error) {
+                core.warning(error.message);
+                if (requireScans) {
+                    core.setFailed(error.message);
+                }
+                return;
+            }
             const vulnerabilities = clairReport.count > 0;
             core.info(`Total Vulnerabilities: ` + clairReport.annotations.length);
             core.info(`Clair report count: ` + clairReport.count);
             const title = clairReport.annotations.length > 0
                 ? `${clairReport.annotations.length} Vulnerabilities founds.`
-                : 'No Vulnerabilities found!';
+                : 'No Vulnerabilities found with level ' + severityLevel + ' or higher!.';
             core.info(`${title}`);
-            if (!clairReport.annotations.length) {
-                if (requireScans) {
-                    core.setFailed(' No Vulnerabilities found!');
-                }
-                return;
-            }
             const pullRequest = github.context.payload.pull_request;
             const link = (pullRequest && pullRequest.html_url) || github.context.ref;
-            const conclusion = vulnerabilities && (clairReport.annotations.filter(value => value.annotation_level === 'failure')).length == 0
-                ? 'success'
-                : 'failure';
+            const conclusion = failWithVulnerabilities && (clairReport.annotations.filter(value => value.annotation_level === 'failure')).length > 0
+                ? 'failure'
+                : 'success';
             const status = 'completed';
             const head_sha = commit || (pullRequest && pullRequest.head.sha) || github.context.sha;
             core.info(`ℹ️ Posting status '${status}' with conclusion '${conclusion}' to ${link} (sha: ${head_sha})`);
@@ -263,16 +272,20 @@ function run() {
             core.debug(JSON.stringify(createCheckRequest, null, 2));
             core.endGroup();
             core.startGroup(`🚀 Publish results`);
-            try {
-                const octokit = github.getOctokit(token);
-                yield octokit.rest.checks.create(createCheckRequest);
-                if (failOnFailure && conclusion === 'failure') {
-                    core.setFailed(`Vulneraabilites reported ${clairReport.annotations.length} failures`);
+            core.info(title);
+            core.info(summary);
+            if (conclusion === 'failure' || (conclusion === 'success' && publishSummary)) {
+                try {
+                    const octokit = github.getOctokit(token);
+                    yield octokit.rest.checks.create(createCheckRequest);
+                    if (conclusion === 'failure') {
+                        core.setFailed(`Vulnerabilities reported ${clairReport.annotations.length} failures`);
+                    }
                 }
-            }
-            catch (error) {
-                core.error(`Failed to create checks using the provided token. (${error})`);
-                core.warning(`This usually indicates insufficient permissions.`);
+                catch (error) {
+                    core.error(`Failed to create checks using the provided token. (${error})`);
+                    core.warning(`This usually indicates insufficient permissions.`);
+                }
             }
             core.endGroup();
         }

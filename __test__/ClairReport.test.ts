@@ -1,4 +1,5 @@
 import {parseScannerReports} from "../src/ClairReport";
+import any = jasmine.any;
 
 
 describe('parseScannerReports', () => {
@@ -67,6 +68,18 @@ describe('parseScannerReports', () => {
         expect(annotations.length).toBe(4);
     });
 
+    it('should fail with file not valid ', async () => {
+        const expected:string = "Unexpected token \"H\" (0x48) in JSON at position 0 while parsing near";
+
+        try {
+            await parseScannerReports(
+                "assets/clair-report/ExistButNotValidFile.json", "High")
+        } catch (e) {
+            expect(e.message).toContain(expected);
+        }
+
+    });
+
     it('should fail with file not found ', async () => {
         try {
             await parseScannerReports(
@@ -76,6 +89,16 @@ describe('parseScannerReports', () => {
         }
 
     });
+
+
+    it('should fail with Json without vulnerabilities node ', async () => {
+        const  {
+            annotations
+        } = await parseScannerReports(
+            "assets/clair-report/VulnerabilitiesNotFound.json", "High");
+        expect(annotations.length).toBe(0);
+    });
+
 
     it('should get Annotations ', async () => {
         const {
@@ -107,7 +130,7 @@ describe('parseScannerReports', () => {
         expect(annotations[1].annotation_level).toBe("failure");
         expect(annotations[2].annotation_level).toBe("failure");
         expect(annotations[3].annotation_level).toBe("failure");
-        expect(annotations[4].annotation_level).toBe("notice");
+        expect(annotations[4].annotation_level).toBe("warning");
         expect(count).toBe(603);
         expect(summaryVulnerabilities.size).toBe(7);
         expect(annotations.length).toBe(473);
