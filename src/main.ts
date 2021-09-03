@@ -45,7 +45,7 @@ export async function run(): Promise<void> {
         core.info(`Clair report count: ` + clairReport.count)
         const title = clairReport.annotations.length > 0
             ? `${clairReport.annotations.length} Vulnerabilities founds.`
-            : 'No Vulnerabilities found!'
+            : 'No Vulnerabilities found with level ' + severityLevel +' or higher !.'
         core.info(`${title}`)
 
         const pullRequest = github.context.payload.pull_request
@@ -87,23 +87,27 @@ export async function run(): Promise<void> {
         core.endGroup()
 
         core.startGroup(`🚀 Publish results`)
+        core.info(title);
+        core.info(summary);
+        if (conclusion === 'failure' || (conclusion === 'success' && publishSummary))
+        {
+            try {
+                const octokit = github.getOctokit(token)
+                await octokit.rest.checks.create(createCheckRequest)
 
-        try {
-            const octokit = github.getOctokit(token)
-            await octokit.rest.checks.create(createCheckRequest)
-
-            if (conclusion === 'failure') {
-                core.setFailed(
-                    `Vulnerabilities reported ${clairReport.annotations.length} failures`
+                if (conclusion === 'failure') {
+                    core.setFailed(
+                        `Vulnerabilities reported ${clairReport.annotations.length} failures`
+                    )
+                }
+            } catch (error) {
+                core.error(
+                    `Failed to create checks using the provided token. (${error})`
+                )
+                core.warning(
+                    `This usually indicates insufficient permissions.`
                 )
             }
-        } catch (error) {
-            core.error(
-                `Failed to create checks using the provided token. (${error})`
-            )
-            core.warning(
-                `This usually indicates insufficient permissions.`
-            )
         }
         core.endGroup()
     } catch (error) {
