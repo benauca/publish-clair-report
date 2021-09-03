@@ -37,6 +37,10 @@ inputs:
     description: 'Severity Level to publish scan'
     required: false
     default: 'High'
+  publish_summary:
+    description: 'Forced the Publication Summary'
+    required: false
+    default: 'false'
 runs:
   using: 'node12'
   main: 'dist/index.js'

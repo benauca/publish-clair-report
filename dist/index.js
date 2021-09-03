@@ -245,12 +245,6 @@ function run() {
                 ? `${clairReport.annotations.length} Vulnerabilities founds.`
                 : 'No Vulnerabilities found!';
             core.info(`${title}`);
-            if (!clairReport.annotations.length) {
-                if (requireScans) {
-                    core.setFailed(' No Vulnerabilities found!');
-                }
-                return;
-            }
             const pullRequest = github.context.payload.pull_request;
             const link = (pullRequest && pullRequest.html_url) || github.context.ref;
             const conclusion = failWithVulnerabilities && (clairReport.annotations.filter(value => value.annotation_level === 'failure')).length > 0

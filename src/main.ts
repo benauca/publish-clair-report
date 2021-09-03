@@ -8,6 +8,7 @@ export async function run(): Promise<void> {
     const commit = core.getInput('commit')
     const requireScans: boolean = core.getInput('require_scans') === 'true'
     const severityLevel = core.getInput('severity_level')
+    const publishSummary: boolean = core.getInput('publish_summary') === 'true'
 
     try {
         core.startGroup(` Getting input values`);
@@ -47,12 +48,6 @@ export async function run(): Promise<void> {
             : 'No Vulnerabilities found!'
         core.info(`${title}`)
 
-        if (!clairReport.annotations.length) {
-            if (requireScans) {
-                core.setFailed(' No Vulnerabilities found!')
-            }
-            return
-        }
         const pullRequest = github.context.payload.pull_request
         const link = (pullRequest && pullRequest.html_url) || github.context.ref
         const conclusion: 'success' | 'failure' =
