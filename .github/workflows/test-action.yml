@@ -22,7 +22,7 @@ jobs:
     - name: Upload GitHub Action workflows logs to elastic
       uses: jbenaventem/upload-github-workflow-logs-to-elastic@main
       with:
-        github_token: "${{ github_token }}"
+        github_token: "${{ secrets.BNAUK_TOKEN }}"
         github_org: "3nauk"
         github_repository: "bbcron-core"
         github_run_id: "${{ github.run_id }}"
