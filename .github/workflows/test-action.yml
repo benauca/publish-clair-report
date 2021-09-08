@@ -14,6 +14,7 @@ jobs:
           report_paths: assets/clair-report/ubu*.json
           publish_summary: 'true'
           severity_level: 'High'
+          fail_with_vulnerabilities: 'true'
   upload-logs-to-elastic:
     runs-on: ubuntu-latest
     needs: [publish-report]
