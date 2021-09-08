@@ -23,8 +23,8 @@ jobs:
       uses: jbenaventem/upload-github-workflow-logs-to-elastic@main
       with:
         github_token: "${{ secrets.BNAUK_TOKEN }}"
-        github_org: "3nauk"
-        github_repository: "bbcron-core"
+        github_org: "benauca"
+        github_repository: "pubish-clair-report"
         github_run_id: "${{ github.run_id }}"
         elastic_host: "${{ secrets.ELASTIC_HOST }}"
         elastic_api_key_id: "${{ secrets.ELASTIC_KEY_ID }}"
