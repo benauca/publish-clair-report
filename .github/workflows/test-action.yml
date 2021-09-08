@@ -25,7 +25,7 @@ jobs:
       with:
         github_token: "${{ secrets.BNAUK_TOKEN }}"
         github_org: "benauca"
-        github_repository: "pubish-clair-report"
+        github_repository: "publish-clair-report"
         github_run_id: "${{ github.run_id }}"
         elastic_host: "${{ secrets.ELASTIC_HOST }}"
         elastic_api_key_id: "${{ secrets.ELASTIC_KEY_ID }}"
