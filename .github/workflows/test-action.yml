@@ -11,9 +11,25 @@ jobs:
       - name: Publish Clair Scan
         uses: ./
         with:
-          report_paths: assets/clair-report/without-securityLevel-vulnerabilities.json
+          report_paths: assets/clair-report/ubu*.json
           publish_summary: 'true'
           severity_level: 'High'
+  upload-logs-to-elastic:
+    runs-on: ubuntu-latest
+    needs: [publish-report]
+    if: always()
+    steps:
+    - name: Upload GitHub Action workflows logs to elastic
+      uses: jbenaventem/upload-github-workflow-logs-to-elastic@main
+      with:
+        github_token: "${{ github_token }}"
+        github_org: "3nauk"
+        github_repository: "bbcron-core"
+        github_run_id: "${{ github.run_id }}"
+        elastic_host: "${{ secrets.ELASTIC_HOST }}"
+        elastic_api_key_id: "${{ secrets.ELASTIC_KEY_ID }}"
+        elastic_api_key: "${{ secrets.ELASTIC_API_KEY }}"
+        elastic_index: "ci-cd"
 
 
 
